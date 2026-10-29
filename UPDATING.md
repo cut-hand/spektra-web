@@ -23,7 +23,7 @@ node scripts/check-upstream.mjs --ref spektralab-v1.3.4
 5. 在隔离的升级分支逐份比对解析后的 JSON，更新 `upstream-version.json` 的源 blob SHA 和规范化内容 SHA-256。改变基线提交时同步修改版本测试的预期提交；检查材料数量、相容性和别名测试是否需要随上游变化。
 6. 执行 `node --test tests/*.test.mjs`。用本地 RAW 再测导入、预览、完整重新解码、TIFF16/ICC、JPEG、批量导出取消、配对和会话恢复。测试照片始终留在被忽略的目录。
 7. 需要宣称原生画质一致时，另行取得相同输入、参数、色彩空间的原生参考输出，进行定量和视觉比较。当前的 LUT 自身插值测试不能替代此步骤。
-8. 更新 `package.json`、网页“关于”、`UPSTREAM.md`、README 和 `TEST-REPORT.md` 的版本、对应范围和检查日期。通过后再发布到 GitHub Pages。
+8. 同步更新入口 HTML 的样式版本查询参数（如 `native.css?v=0.3.1`）以刷新浏览器缓存。更新 `package.json`、网页“关于”、`UPSTREAM.md`、README 和 `TEST-REPORT.md` 的版本、对应范围和检查日期。通过后再发布到 GitHub Pages。
 
 ## 发布与回退
 
