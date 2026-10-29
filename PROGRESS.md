@@ -77,3 +77,12 @@
 - 新增只读上游版本/材料/许可差异检查脚本，支持最新发布或指定 ref；网络失败不误报为无变化。
 - UPDATING.md 明确固定提交、审查差异、导入数据、回归、版本同步、发布与回退步骤。
 - 未开启无人值守自动更新；脚本不会覆盖当前实现或上传照片。
+
+## 部署完成与正式站点验证（2026-10-30）
+- GitHub 仓库 https://github.com/cut-hand/spektra-web，首次完整提交 77f39f3fa8b3448884b928500e8c0413bbc86635。
+- GitHub Pages https://cut-hand.github.io/spektra-web/ 已成功部署，main 根目录发布，HTTPS 开启。
+- 正式 Pages 首次打开完成引导，示例 GPU 渲染成功；真实 RAW 本机解码 3514×2344、16 位，GPU 显影成功。
+- 正式网站 Cube 下载包含 Andrea Volpato / spektrafilm 署名、CC BY-SA 4.0 链接和修改声明。
+- 原试用站点也已同步发布为 0.2.0。
+- 24 项自动测试通过；上游更新脚本对固定 1.3.4 和最新正式发布的真实 API 检查通过。
+- Git 本地 main 对接 GitHub，原 master 开发检查点保留；照片和测试截图仍被忽略。
