@@ -4,7 +4,7 @@
 
 这是基于 [SpektraLab](https://github.com/JamesQiu2005/SpektraLab) / [spektrafilm](https://github.com/andreavolpato/spektrafilm) 材料数据的独立浏览器移植。**功能和画质一致性是两件事：当前光谱重建及空间效果仍有独立实现，尚不能宣称原生引擎逐像素一致。**
 
-**版本基线：SpektraLab 1.3.4**（标签 `spektralab-v1.3.4`，提交 `fd891c6bc5eb350387602deb5c1ef9b6dcdab948`）；浏览器版 **0.3.0**。34 份材料和目录已逐份比对。对应范围和未实现部分见 [UPSTREAM.md](./UPSTREAM.md)。
+**版本基线：SpektraLab 1.3.4**（标签 `spektralab-v1.3.4`，提交 `fd891c6bc5eb350387602deb5c1ef9b6dcdab948`）；浏览器版 **0.3.1**。34 份材料和目录已逐份比对。对应范围和未实现部分见 [UPSTREAM.md](./UPSTREAM.md)。
 
 在线使用：[GitHub Pages](https://cut-hand.github.io/spektra-web/) · [授权与来源](./NOTICE.html)
 
@@ -30,7 +30,7 @@ CineStill 800T 按原项目规则继承 Vision3 500T 数值并选择移除防光
 
 ## 布局与对应范围
 
-0.3.0 按原版重排为紧凑灰色三栏：左侧导航、设置剪贴板、胶片、片边、日期后背、印相、裁剪、放大机；右侧显影前/后参数。材料使用分组文字列表。详细未实现、部分实现和近似算法见 [FEATURE-GAPS.md](./FEATURE-GAPS.md)。
+0.3.1 按原版重排为紧凑灰色三栏：左侧导航、设置剪贴板、胶片、片边、日期后背、印相、裁剪、放大机；右侧显影前按宽容度、输入/相机、胶片画幅、场景置位排列，显影后单独分组；其他控制由对应的 ⋯ 菜单访问。文件信息位于顶部，底部只保留缩略图带。材料使用分组文字列表。详细未实现、部分实现和近似算法见 [FEATURE-GAPS.md](./FEATURE-GAPS.md)。
 
 ## 工作流
 
