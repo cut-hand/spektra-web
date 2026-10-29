@@ -4,7 +4,7 @@
 
 这是基于 [SpektraLab](https://github.com/JamesQiu2005/SpektraLab) / [spektrafilm](https://github.com/andreavolpato/spektrafilm) 材料数据的独立浏览器移植。**功能和画质一致性是两件事：当前光谱重建及空间效果仍有独立实现，尚不能宣称原生引擎逐像素一致。**
 
-**版本基线：SpektraLab 1.3.4**（标签 `spektralab-v1.3.4`，提交 `fd891c6bc5eb350387602deb5c1ef9b6dcdab948`）；浏览器版 **0.2.0**。34 份材料和目录已逐份比对。对应范围和未实现部分见 [UPSTREAM.md](./UPSTREAM.md)。
+**版本基线：SpektraLab 1.3.4**（标签 `spektralab-v1.3.4`，提交 `fd891c6bc5eb350387602deb5c1ef9b6dcdab948`）；浏览器版 **0.3.0**。34 份材料和目录已逐份比对。对应范围和未实现部分见 [UPSTREAM.md](./UPSTREAM.md)。
 
 在线使用：[GitHub Pages](https://cut-hand.github.io/spektra-web/) · [授权与来源](./NOTICE.html)
 
@@ -15,7 +15,7 @@
 3. 调整输入曝光、白平衡、胶片显影、放大机和扫描参数。日期后背在胶片处理之前叠加；片边在扫描之后合成。
 4. 导出 JPEG、PNG、16 位 TIFF 或 33³ Cube。多张照片按各自设置依次显影，打包为 ZIP；可以取消。
 
-按住空格查看原图，⌘/Ctrl+Z 撤销，⌘/Ctrl+Shift+Z 重做，左右箭头切换照片。缩略图复选框、Shift/⌘/Ctrl 点击用于多选；拖动缩略图排序。支持按全部、材料、光色、构图或质感同步设置。
+按住空格查看原图，⌘/Ctrl+Z 撤销，⌘/Ctrl+Shift+Z 重做，左右箭头切换照片。缩略图复选框、Shift/⌘/Ctrl 点击用于多选；拖动缩略图排序。左侧设置剪贴板可独立勾选胶片&相纸、曝光、白平衡、胶片效果、相纸效果、场景置位六组。复制记录当时分组；粘贴使用复制时分组，同步使用当前勾选。裁切、片边、日期和显影后调整保留在目标照片上。
 
 ## 材料
 
@@ -27,6 +27,10 @@
 - 6 款彩色相纸、Ilford Multigrade IV RC、Kodak 2383 / 2393 拷贝片。
 
 CineStill 800T 按原项目规则继承 Vision3 500T 数值并选择移除防光晕层的路径，不提供虚构的独立测量数据。
+
+## 布局与对应范围
+
+0.3.0 按原版重排为紧凑灰色三栏：左侧导航、设置剪贴板、胶片、片边、日期后背、印相、裁剪、放大机；右侧显影前/后参数。材料使用分组文字列表。详细未实现、部分实现和近似算法见 [FEATURE-GAPS.md](./FEATURE-GAPS.md)。
 
 ## 工作流
 
