@@ -33,3 +33,7 @@ dialog{background:#303030;border-color:#555;border-radius:9px;color:#ddd}dialog 
 
 /* Native rail spacing: keep the four parameter groups visible at laptop height. */
 .latitude-view canvas{height:64px}.latitude-ramp{height:5px;margin:4px 0 3px}.latitude-axis{font-size:9px;line-height:11px}.latitude-coverage{margin-top:4px}.latitude-limits{line-height:12px;margin-top:4px}.as-shot-row{margin-bottom:6px}.native-layout #inputPanel .unavailable-control{min-height:20px;margin-top:4px}.native-layout #inputPanel>.rail-body{padding-bottom:8px}.physical-frame-controls .material-select{margin-bottom:7px}.film-active-controls{margin-top:5px}.film-active-controls .material-check{min-height:25px;margin-bottom:0}
+
+/* Keep only photographs in the native bottom strip; management lives in More tools. */
+.native-layout .filmstrip{display:flex;align-items:center;grid-template-rows:none}.native-layout .filmstrip-title{display:none}.native-layout .thumbnails{width:100%;height:100%}.native-layout .thumbnail{width:150px;height:103px}.native-layout .library-actions{display:flex;margin:7px 0 12px;flex-wrap:wrap}.native-layout #libraryCount{font-size:10px;color:#aaa}
+@media(max-width:720px){.native-layout .thumbnail{width:100px;height:68px}}
