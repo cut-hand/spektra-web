@@ -1,0 +1,238 @@
+{
+  "browser_version": "0.2.0",
+  "checked_on": "2026-10-30",
+  "upstream_repository": "https://github.com/JamesQiu2005/SpektraLab",
+  "upstream_release": "spektralab-v1.3.4",
+  "upstream_commit": "fd891c6bc5eb350387602deb5c1ef9b6dcdab948",
+  "comparison_scope": "Material JSON and catalogue only; independent experimental browser engine, no native numerical parity claim.",
+  "files": [
+    {
+      "local_path": "stock-catalog.json",
+      "upstream_path": "modern_UI/Spektrafilm/Spektrafilm/Resources/StockCatalog.json",
+      "upstream_blob_sha": "f48cb1c8f2aabe7cd599f98cae68f3a4c1a7df16",
+      "canonical_json_sha256": "0e052661fc1bb53e0bd5fb4740c8041002ae13e0dd28bfa70f648455e71352a8"
+    },
+    {
+      "local_path": "profiles/fujifilm_c200.json",
+      "upstream_path": "engine/resources/profiles/fujifilm_c200.json",
+      "upstream_blob_sha": "a46e6413a5d2784a44fbd005738cab49cfffbbca",
+      "canonical_json_sha256": "9ada4607666e1ed688ef1f400ddb7803bf01297ecc157426375f5ecbdd6a0bc9"
+    },
+    {
+      "local_path": "profiles/fujifilm_crystal_archive_typeii.json",
+      "upstream_path": "engine/resources/profiles/fujifilm_crystal_archive_typeii.json",
+      "upstream_blob_sha": "a026b2b070fdac3652358573aff499b235faa562",
+      "canonical_json_sha256": "2c72af130cb674754c7d18f5a4ca9f654493d7a7f7df2798835a76e9b909779c"
+    },
+    {
+      "local_path": "profiles/fujifilm_pro_400h.json",
+      "upstream_path": "engine/resources/profiles/fujifilm_pro_400h.json",
+      "upstream_blob_sha": "56838db62865ff06c033e731f760d5e28210e592",
+      "canonical_json_sha256": "93ca48dbb4f8eca472359f6e5f080eade0c8c8c40f198ffd3aeaed69e2cdf4d5"
+    },
+    {
+      "local_path": "profiles/fujifilm_provia_100f.json",
+      "upstream_path": "engine/resources/profiles/fujifilm_provia_100f.json",
+      "upstream_blob_sha": "ae08afb23dcc2a46507ef43e34cbf896b3303319",
+      "canonical_json_sha256": "69fbaf8520ff00b621172806a760eec178c7cad8a5e062c0b35cd953d5522d1f"
+    },
+    {
+      "local_path": "profiles/fujifilm_velvia_100.json",
+      "upstream_path": "engine/resources/profiles/fujifilm_velvia_100.json",
+      "upstream_blob_sha": "cbea6d15cae3ac19c1eff9d91da5490cadd49f39",
+      "canonical_json_sha256": "c679935c9bc23ba3e7803bd89db778c9625f642d7935b04176d666c7116bc785"
+    },
+    {
+      "local_path": "profiles/fujifilm_xtra_400.json",
+      "upstream_path": "engine/resources/profiles/fujifilm_xtra_400.json",
+      "upstream_blob_sha": "5222f4f5a9076850ca64a41a441731087d8345ad",
+      "canonical_json_sha256": "b02df307dc91bb08576a6a45194e94bc33b31e37cad45fd20a85a07306c49d95"
+    },
+    {
+      "local_path": "profiles/kodak_2383.json",
+      "upstream_path": "engine/resources/profiles/kodak_2383.json",
+      "upstream_blob_sha": "d04217d8a2365c67c40fcaa008c3cf94b8d91894",
+      "canonical_json_sha256": "f2e019647b7339bc139d3fa124500eb9ca7dfd09b1ad2603f1f91bc0881a9f05"
+    },
+    {
+      "local_path": "profiles/kodak_2393.json",
+      "upstream_path": "engine/resources/profiles/kodak_2393.json",
+      "upstream_blob_sha": "156c939fef1d466afe3a10d691ec306d5def9eca",
+      "canonical_json_sha256": "26aa0f41aceb1a948bdc3f7ae4e7d4de8604eab9a51824025817925af5856d74"
+    },
+    {
+      "local_path": "profiles/kodak_ektachrome_100.json",
+      "upstream_path": "engine/resources/profiles/kodak_ektachrome_100.json",
+      "upstream_blob_sha": "8d187efca11b985fc54b56c8f9cb643ba523ccf0",
+      "canonical_json_sha256": "80eeb058907b4c8459e2f5eb24822197be909e5fa93b5514f151dbd9b9f89983"
+    },
+    {
+      "local_path": "profiles/kodak_ektacolor_edge.json",
+      "upstream_path": "engine/resources/profiles/kodak_ektacolor_edge.json",
+      "upstream_blob_sha": "ec18bff56a39c298f37a5b446beae19761a734c7",
+      "canonical_json_sha256": "eb36cfe631cb42e5c0af63336687654667cebba1f34288ca8924c89ff1acef35"
+    },
+    {
+      "local_path": "profiles/kodak_ektar_100.json",
+      "upstream_path": "engine/resources/profiles/kodak_ektar_100.json",
+      "upstream_blob_sha": "242e7e2ef2b041a878adfa82c38f306ff97e7f86",
+      "canonical_json_sha256": "2d53e83aacefc10f46a24c9f5bab1dabfee8832ea883e5c333e1823101477b8c"
+    },
+    {
+      "local_path": "profiles/kodak_endura_premier.json",
+      "upstream_path": "engine/resources/profiles/kodak_endura_premier.json",
+      "upstream_blob_sha": "41bbbdcdd816fe14f3ab558d95f546c77ca5ccd9",
+      "canonical_json_sha256": "484a645ffe359bbe55773254d36c15be420ae99cef183208fedecc76a2f406ba"
+    },
+    {
+      "local_path": "profiles/kodak_gold_200.json",
+      "upstream_path": "engine/resources/profiles/kodak_gold_200.json",
+      "upstream_blob_sha": "c4ee86767ca1ac69300537e443d9cacd4fd50e78",
+      "canonical_json_sha256": "7403b12b3a18b176b682b9b88a41630ece8f820d690c45b977e9871ea89f83ef"
+    },
+    {
+      "local_path": "profiles/kodak_kodachrome_64.json",
+      "upstream_path": "engine/resources/profiles/kodak_kodachrome_64.json",
+      "upstream_blob_sha": "31f58cb1b6011ebb3fbbb65415a4eedefc5ebf7f",
+      "canonical_json_sha256": "fbee3d69337fcce5e581afcc60ee4ff390e820aeb7f7c7c243c9e98b3d46891f"
+    },
+    {
+      "local_path": "profiles/kodak_portra_160.json",
+      "upstream_path": "engine/resources/profiles/kodak_portra_160.json",
+      "upstream_blob_sha": "1108a992efb068008caa06b0c3f338fc9d5c744a",
+      "canonical_json_sha256": "274d1e3824f6c0089257489430abe065ff008520e77e5533f87634b40459d534"
+    },
+    {
+      "local_path": "profiles/kodak_portra_400.json",
+      "upstream_path": "engine/resources/profiles/kodak_portra_400.json",
+      "upstream_blob_sha": "39f0fb62a8a55cdc3b9d22157cf72438bfab2199",
+      "canonical_json_sha256": "28abe34d7ad33b33327aa985c91c4d813f004b83d8bc5e063f0f27eda04bfca0"
+    },
+    {
+      "local_path": "profiles/kodak_portra_800.json",
+      "upstream_path": "engine/resources/profiles/kodak_portra_800.json",
+      "upstream_blob_sha": "c05fefb7940de296bf79e823073a2382f5c2a6d9",
+      "canonical_json_sha256": "1c21e8c17d2e6eac1fa68380a8dd5a15fb76d06f2f0f36b377fb3b611e51371f"
+    },
+    {
+      "local_path": "profiles/kodak_portra_800_push1.json",
+      "upstream_path": "engine/resources/profiles/kodak_portra_800_push1.json",
+      "upstream_blob_sha": "176737fb0f21435583af1161a68c4c8debba752f",
+      "canonical_json_sha256": "ba754c84f4983e1b19749a8daf8e0805532200f941683f94eae15957f392d547"
+    },
+    {
+      "local_path": "profiles/kodak_portra_800_push2.json",
+      "upstream_path": "engine/resources/profiles/kodak_portra_800_push2.json",
+      "upstream_blob_sha": "5b24db9da7e6cbab66bacfd8ed99911c9cb2c402",
+      "canonical_json_sha256": "3ab4d61c7119918572adbc40e71b9c44c74f77a174b70b8f7cca02e09e661b41"
+    },
+    {
+      "local_path": "profiles/kodak_portra_endura.json",
+      "upstream_path": "engine/resources/profiles/kodak_portra_endura.json",
+      "upstream_blob_sha": "5ec687f9f966fb630c8ab242a86bfb0fbac215ef",
+      "canonical_json_sha256": "a26b2615794d197b58d882ba36e57f9fb4474253a713bd8ec8c8820fca903f45"
+    },
+    {
+      "local_path": "profiles/kodak_supra_endura.json",
+      "upstream_path": "engine/resources/profiles/kodak_supra_endura.json",
+      "upstream_blob_sha": "12266ce6c6619025e63a250c5dfe1ef70d32c027",
+      "canonical_json_sha256": "9005c31434d65b2b0bf85b183196fc4115f02383b492fe8faa4c62aeb714713c"
+    },
+    {
+      "local_path": "profiles/kodak_ultra_endura.json",
+      "upstream_path": "engine/resources/profiles/kodak_ultra_endura.json",
+      "upstream_blob_sha": "86a76438e425a1bd106b1c5469afa2488cbfcbc7",
+      "canonical_json_sha256": "139869b551d0ac2b45e00a9674667d5e790075d26cc11728dc9960f6ba5ff095"
+    },
+    {
+      "local_path": "profiles/kodak_ultramax_400.json",
+      "upstream_path": "engine/resources/profiles/kodak_ultramax_400.json",
+      "upstream_blob_sha": "9d2a64f8f917a4a9a6d3a58c52dd13864cce88b2",
+      "canonical_json_sha256": "e6312be229dff0e77f964235eb8124890bf864f16ccacb0228b37a85cad799c2"
+    },
+    {
+      "local_path": "profiles/kodak_verita_200d.json",
+      "upstream_path": "engine/resources/profiles/kodak_verita_200d.json",
+      "upstream_blob_sha": "99607b450a78d89cf41786dcef6a53711a29267e",
+      "canonical_json_sha256": "474ade6207086203e8b97be58432abcd30f0e6f0dda147c26a68297b08a985fc"
+    },
+    {
+      "local_path": "profiles/kodak_vision3_200t.json",
+      "upstream_path": "engine/resources/profiles/kodak_vision3_200t.json",
+      "upstream_blob_sha": "8fc197eab9ce8754bd386a87e260cd2ac5f48185",
+      "canonical_json_sha256": "0be4fdb582cdff5b10943d7e7d7379fa3a12a5cd72690ca7856930c8b5cfb1e6"
+    },
+    {
+      "local_path": "profiles/kodak_vision3_250d.json",
+      "upstream_path": "engine/resources/profiles/kodak_vision3_250d.json",
+      "upstream_blob_sha": "d54518ee2bed1c3f8673b8cae639dfacaed84ecd",
+      "canonical_json_sha256": "c21bddaf86ed4ee1f0867d4a67a394908ff9bbc162c22e14113983e76ee87d00"
+    },
+    {
+      "local_path": "profiles/kodak_vision3_500t.json",
+      "upstream_path": "engine/resources/profiles/kodak_vision3_500t.json",
+      "upstream_blob_sha": "d770189f958512c7a0e8e7f6d324ff39c7e7ce68",
+      "canonical_json_sha256": "da18f8bae7c7308125ae5931d9b8eaed60fa5f82ebb11c7955eb1f86666944bc"
+    },
+    {
+      "local_path": "profiles/kodak_vision3_50d.json",
+      "upstream_path": "engine/resources/profiles/kodak_vision3_50d.json",
+      "upstream_blob_sha": "cf51b69d37169181288f8472d73258550807d402",
+      "canonical_json_sha256": "822ec943733b9c7529d8d36656bdea18c6d8956eff12a977ff573cdb8de7e96e"
+    },
+    {
+      "local_path": "profiles/cinestill_800t.json",
+      "upstream_path": "engine/resources_product/profiles/cinestill_800t.json",
+      "upstream_blob_sha": "cfa29a6fd6458a762c8675796e9d44a776b619f2",
+      "canonical_json_sha256": "77bd2b747095f2a0bea4b7f53d07fa4f6913082a8dd3087ba6eead18b12db816"
+    },
+    {
+      "local_path": "profiles/fujifilm_neopan_acros_100_ii.json",
+      "upstream_path": "engine/resources_product/profiles/fujifilm_neopan_acros_100_ii.json",
+      "upstream_blob_sha": "b914eb673c5461776886ab57917fa33cba394367",
+      "canonical_json_sha256": "94092372c18c63d09db4660bcb374b911fa100a1e6321b540917ce54d2a219b8"
+    },
+    {
+      "local_path": "profiles/ilford_hp5_plus_400.json",
+      "upstream_path": "engine/resources_product/profiles/ilford_hp5_plus_400.json",
+      "upstream_blob_sha": "670273421eaf39b9fa9b633df6d31c69ac7c075c",
+      "canonical_json_sha256": "78843eba6354029833bf7094c69cc85bf2669b27be2c44806195f71d9fa37a62"
+    },
+    {
+      "local_path": "profiles/ilford_multigrade_iv_rc.json",
+      "upstream_path": "engine/resources_product/profiles/ilford_multigrade_iv_rc.json",
+      "upstream_blob_sha": "f45b5fb9636045251c2a282bf25789e5c0a20d83",
+      "canonical_json_sha256": "f062567654592cb14acaf751b2e440ee53828897552e45a830adede67f864555"
+    },
+    {
+      "local_path": "profiles/kodak_tmax_100.json",
+      "upstream_path": "engine/resources_product/profiles/kodak_tmax_100.json",
+      "upstream_blob_sha": "0f112fa51dda8408039b2bfc165872ac83f1ce46",
+      "canonical_json_sha256": "cc87793d4f9ec7fe642b42709f0d7fb9656d1b2a7e7f43a4cad924861220dc29"
+    },
+    {
+      "local_path": "profiles/kodak_tri_x_400.json",
+      "upstream_path": "engine/resources_product/profiles/kodak_tri_x_400.json",
+      "upstream_blob_sha": "de0cc44f091533c81575af10168678927800a606",
+      "canonical_json_sha256": "6a313367b4fa58f27486ca810eb41c907e7bf3542d958f8413a94d39aa86d451"
+    }
+  ],
+  "notices": [
+    {
+      "upstream_path": "engine/resources_product/NOTICE.md",
+      "upstream_blob_sha": "6e9f573920250c7986e14b33ed9056aeaa6cd014"
+    },
+    {
+      "upstream_path": "license/LICENSE",
+      "upstream_blob_sha": "f288702d2fa16d3cdf0035b15a9fcbc552cd88e7"
+    },
+    {
+      "upstream_path": "license/SPEKTRAFILM_LICENSE.txt",
+      "upstream_blob_sha": "303ba46793ae40c11442d6b94609165325570a91"
+    },
+    {
+      "upstream_path": "modern_UI/Spektrafilm/Spektrafilm/Resources/Licenses/Profiles-and-LUTs-CHANGELOG.txt",
+      "upstream_blob_sha": "13e08fa306d8e14378ed8c5ad11f1064dc27c81f"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "spektra-browser-darkroom",
+  "version": "0.2.0",
+  "type": "module",
+  "private": true,
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "check:upstream": "node scripts/check-upstream.mjs"
+  }
+}
