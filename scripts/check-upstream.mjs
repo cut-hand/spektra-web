@@ -23,7 +23,7 @@ export function compareNativeTree(manifest,tree){
  const expected={...(manifest.source_blobs||{}),...(manifest.reference_blobs||{})};
  const changes=[];
  for(const [path,sha] of Object.entries(expected)){const now=current.get(path);if(now!==sha)changes.push({path,status:now?'changed':'removed',baseline_sha:sha,current_sha:now||null});}
- for(const [path,sha] of current)if(/^engine\/src\/core\/[^/]+\.(cpp|hpp)$/.test(path)&&!Object.hasOwn(expected,path))changes.push({path,status:'added',current_sha:sha});
+ for(const [path,sha] of current)if(/^engine\/src\/(?:core|pipeline|gpu|shaders)\/[^/]+\.(cpp|hpp|h|metal)$/.test(path)&&!Object.hasOwn(expected,path))changes.push({path,status:'added',current_sha:sha});
  return changes;
 }
 

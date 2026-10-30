@@ -17,6 +17,8 @@
 #include "cam16.hpp"
 #include "digital_intermediate.hpp"
 #include "setup_cache.hpp"
+#include "pipeline.hpp"
+#include "cpu-backend.hpp"
 using namespace spk;
 namespace {
 std::string error;
@@ -142,16 +144,74 @@ struct Model{
  }
 };
 std::unique_ptr<Model> model;
-std::vector<float> packed;
-void pack_model(){
- const auto&m=*model;packed.assign(64,0);auto add=[&](int slot,const double*p,size_t n){packed[slot]=float(packed.size());for(size_t i=0;i<n;i++)packed.push_back(float(p[i]));};auto vec=[&](int slot,const Vec&v){add(slot,v.data(),v.size());};auto mat=[&](int slot,const Mat3&v){double row[9];v.to_row_major(row);add(slot,row,9);};auto spec=[&](int slot,const SpectralConstants&sc){packed[slot]=float(packed.size());for(const auto*v:{&sc.channel_density,&sc.base_density,&sc.illum_x_sens})for(double x:*v)packed.push_back(float(x));};auto table=[&](int slot,const InterpTables&t){vec(slot,t.x);vec(slot+1,t.inv);vec(slot+2,t.y);};
- packed[0]=float(m.side);packed[1]=float(m.filmCurve.k);packed[2]=float(m.paperCurve.k);packed[3]=m.p.film.info.is_positive();packed[4]=m.p.io.scan_film;packed[5]=m.isDI;packed[6]=m.p.film_render.dir_couplers.active;packed[7]=float(std::exp2(m.p.camera.exposure_compensation_ev));packed[8]=float(m.p.enlarger.print_exposure);packed[9]=float(m.bwgain);packed[10]=m.bw;
- if(m.bw){double black=colour.cctf_decode(m.p.scanner.black_level,"sRGB"),white=colour.cctf_decode(m.p.scanner.white_level,"sRGB");if(m.p.scanner.black_correction&&!m.p.scanner.white_correction)white=m.ywhite;if(m.p.scanner.white_correction&&!m.p.scanner.black_correction)black=m.yblack;packed[11]=float((white-black)/(m.ywhite-m.yblack+1e-10));packed[12]=float(black-packed[11]*m.yblack);}
- packed[13]=m.p.print_render.edr_enabled&&!m.p.io.scan_film&&m.p.print.data.edr_tone_map.available();
- vec(16,m.tc);mat(17,m.toXYZ);table(18,m.filmCurve);table(21,m.couplerCurve);add(24,m.dir,9);add(25,m.p.film.density_max,3);table(26,m.paperCurve);spec(29,m.print.spectral);add(30,m.print.gain,3);add(31,m.print.offset,3);spec(32,m.scanner);mat(33,m.scanRGB);mat(34,m.outputMatrix);
- const auto&c=m.cam;const auto&og=m.p.io.output_gamut_compress;double k[22]={c.F_L,c.N_bb,c.N_cb,c.n,c.z,c.A_w,c.c,c.N_c,c.l_grid.front(),c.l_grid.back(),c.h_grid.front(),c.h_grid[1]-c.h_grid[0],og.knee[0],og.knee[1],og.knee[2],og.lightness_compression_active?og.lightness_compression[0]:1e10,og.lightness_compression[1],og.lightness_compression[2],c.white_Jp,c.D_rgb[0],c.D_rgb[1],c.D_rgb[2]};add(35,k,22);vec(36,c.c_max_table);mat(37,c.m_to_xyz);mat(38,c.m_to_rgb);
- if(m.isDI){SpectralConstants sc;sc.channel_density=m.di.chd;sc.base_density.assign(81,0);sc.illum_x_sens=m.di.ixs;spec(39,sc);table(40,m.di.curve);packed[43]=float(m.di.curve.k);add(44,m.di.matrix,9);double live[3];di_live_offsets(m.p,live);add(45,live,3);packed[46]=float(m.di.positive_floor);}
- if(packed[13]){const auto&e=m.p.print.data.edr_tone_map;vec(47,e.target_log2_y);packed[48]=float(e.target_log2_y.size());packed[49]=float(e.domain_log2_y[0]);packed[50]=float(e.domain_log2_y[1]);packed[51]=float(e.toe_y);packed[52]=float(e.shoulder_y);Mat3 yy;std::string ignored;colour.matrix_RGB_to_XYZ("sRGB",nullptr,"CAT02",yy,ignored);add(53,yy.m[1],3);}
+std::unique_ptr<gpu::Gpu> cpu;
+double lastMeter=0;
+double value(const Json&o,const char*k,double d){return o.at(k).as_double(d);}
+bool frame(const float*input,float*output,uint32_t w,uint32_t h,const Json&o){
+ if(!model){error="Native model is not prepared";return false;}
+ if(!w||!h||size_t(w)*h>12000000){error="WASM frame exceeds 12 MP; reduce output size";return false;}
+ if(!cpu)cpu.reset(gpu::create_cpu());
+ Params p=model->p;
+ p.io.input_color_space=p.io.output_color_space="ProPhoto RGB";
+ p.io.input_cctf_decoding=false;p.io.output_cctf_encoding=true;
+ p.io.digital_intermediate=model->isDI;
+ p.camera.film_format_mm=value(o,"filmLongMm",36);
+ p.camera.exposure_compensation_ev+=value(o,"cameraExposure",0);
+ const auto meter=o.at("metering").is_string()?o.at("metering").as_string():"average";
+ p.camera.auto_exposure=meter!="off";
+ const std::map<std::string,std::string> meters={{"average","balanced"},{"center","center"},{"highlight","protect_highlights"},{"shadow","protect_shadows"},{"median","median"}};
+ if(p.camera.auto_exposure){auto it=meters.find(meter);if(it==meters.end()){error="Unknown meter";return false;}p.camera.auto_exposure_method=it->second;}
+ p.camera.lens_blur_um=value(o,"lensBlur",0);
+ auto&hal=p.film_render.halation;
+ hal.antihalation_removed=o.at("antihalationRemoved").as_bool(false);apply_halation_preset(p);
+ hal.active=o.at("halationActive").as_bool(true);
+ hal.halation_amount=value(o,"halation",100)/100.;
+ hal.halation_spatial_scale=value(o,"halationRadius",1);
+ // Scatter retains the film's own default. The browser's old extra slider
+ // now scales its native spatial length, rather than adding RGB glow.
+ hal.scatter_spatial_scale*=1.+value(o,"diffusion",0)/100.;
+ hal.headroom_ev=value(o,"headroom",0);
+ auto&g=p.film_render.grain;g.active=o.at("grainActive").as_bool(true);g.amount=value(o,"grain",100)/100.;g.particle_area_um2*=std::pow(value(o,"grainSize",1),2.);
+ p.settings.grain_sampler="exact";p.settings.striped=false;
+ p.print_render.glare.active=o.at("glareActive").as_bool(true)&&o.at("printEffects").as_bool(true);
+ p.print_render.glare.amount=1.+value(o,"glare",0)/100.;
+ p.print_render.contrast_mask.highlights=value(o,"contrastMaskHighlights",0);p.print_render.contrast_mask.shadows=value(o,"contrastMaskShadows",0);
+ p.print_render.contrast_mask.active=p.print_render.contrast_mask.highlights>0||p.print_render.contrast_mask.shadows>0;
+ auto&sl=p.camera.scene_latitude;sl.highlight_room=value(o,"sceneHighlights",0);sl.shadow_room=value(o,"sceneShadows",0);sl.active=sl.highlight_room>0||sl.shadow_room>0;
+ p.scanner.unsharp_mask[1]=value(o,"sharpen",0)/100.;
+ const double pg=value(o,"paperGamma",1);if(pg!=1){p.print_render.density_curves_morph.active=true;p.print_render.density_curves_morph.gamma_factor=pg;}
+ Pipeline pipe(cpu.get(),&colour,&blob,&cache);if(!pipe.build(p,error))return false;
+ const auto src=o.at("sourceColorSpace").is_string()?o.at("sourceColorSpace").as_string():"sRGB";
+ const bool encoded=o.at("sourceEncoded").as_bool(true);
+ Mat3 convert;if(!colour.matrix_RGB_to_RGB(src,"ProPhoto RGB","CAT02",convert,error))return false;
+ Image in;in.w=w;in.h=h;in.c=3;in.buf=cpu->alloc(in.bytes(),error);if(!in.buf)return false;
+ auto*linear=static_cast<float*>(cpu->contents(in.buf.get()));
+ const Json& gain=o.at("cameraGains");double gains[3]={1,1,1};if(gain.is_array()&&gain.items().size()==3)for(int c=0;c<3;c++)gains[c]=gain.items()[c].as_double(1);
+ for(size_t i=0;i<size_t(w)*h;i++){double a[3],b[3];for(int c=0;c<3;c++){const auto v=input[i*3+c];if(!std::isfinite(v)){error="Non-finite source pixel";return false;}a[c]=encoded?colour.cctf_decode(v,src):v;}convert.apply(a,b);for(int c=0;c<3;c++)linear[i*3+c]=float(b[c]*gains[c]);}
+ pipe.set_source_long_edge(uint32_t(value(o,"sourceLongEdge",std::max(w,h))),uint32_t(value(o,"frameLongEdge",std::max(w,h))));
+ if(p.camera.auto_exposure){double ev;if(!pipe.measure_exposure_ev(in,ev,error,true))return false;pipe.set_auto_exposure_ev(ev);lastMeter=ev;}else lastMeter=0;
+ Image negative,scan;if(!pipe.run_film(in,negative,nullptr,error)||!pipe.run_print(negative,scan,nullptr,error))return false;
+ const auto*rgb=static_cast<const float*>(cpu->contents(scan.buf.get()));
+ const auto dst=o.at("targetColorSpace").is_string()?o.at("targetColorSpace").as_string():"sRGB";
+ if(!colour.matrix_RGB_to_RGB("ProPhoto RGB",dst,"CAT02",convert,error))return false;
+ // The app's output transform occurs once, after the completed ProPhoto
+ // scan. Same CAT02/CAM16/CCTF contract as spk_output_transform upstream.
+ Model transform;transform.p.io.output_gamut_compress=GamutCompressSpec::output_default();const Cam16Setup* cm=nullptr;
+ if(dst!="ProPhoto RGB"&&!cache.cam16(colour,dst,cm,error))return false;if(cm)transform.cam=*cm;
+ for(size_t i=0;i<size_t(w)*h;i++){
+  double lin[3],dest[3];if(model->isDI){for(int c=0;c<3;c++)output[i*3+c]=rgb[i*3+c];continue;}
+  for(int c=0;c<3;c++)lin[c]=colour.cctf_decode(rgb[i*3+c],"ProPhoto RGB");
+  // Existing browser creative controls, in the wide working space. Zero
+  // controls are an identity. These are not claimed as native app grading.
+  for(int c=0;c<3;c++){double temp=c==0?1+value(o,"temperature",0)*.002:c==2?1-value(o,"temperature",0)*.002:std::exp2(-value(o,"postTint",0)/150.);lin[c]*=std::exp2(value(o,"exposure",0))*temp;}
+  double enc[3];for(int c=0;c<3;c++)enc[c]=colour.cctf_encode(lin[c],"ProPhoto RGB");
+  double luma=enc[0]*.28804+enc[1]*.71187+enc[2]*.00009;
+  for(int c=0;c<3;c++){double v=(enc[c]-.5)*(1+value(o,"contrast",0)/100.)+.5;v=luma+(v-luma)*(1+value(o,"saturation",0)/100.);double t=v;v+=4*t*(1-t)*(value(o,"curveShadows",0)*std::exp(-std::pow((t-.2)/.18,2))+value(o,"curveMid",0)*std::exp(-std::pow((t-.5)/.2,2))+value(o,"curveHighlights",0)*std::exp(-std::pow((t-.8)/.18,2)))*.004;const char*bal[3]={"balanceR","balanceG","balanceB"},*sh[3]={"shadowR","shadowG","shadowB"},*hi[3]={"highlightR","highlightG","highlightB"};v+=(value(o,bal[c],0)+value(o,sh[c],0)*std::pow(1-clamp(luma),2)+value(o,hi[c],0)*std::pow(clamp(luma),2))*.003;lin[c]=colour.cctf_decode(v,"ProPhoto RGB");}
+  convert.apply(lin,dest);if(cm)transform.compress(dest);
+  double x=(double(i%w)+.5)/w-.5,y=(double(i/w)+.5)/h-.5,vig=1.-value(o,"vignette",0)/100.*clamp((x*x+y*y)*1.5);
+  for(int c=0;c<3;c++){double v=colour.cctf_encode(dest[c]*vig,dst);if(!std::isfinite(v)){error="Non-finite native output";return false;}output[i*3+c]=float(v);}
+ }
+ return true;
 }
 
 }
@@ -159,8 +219,11 @@ extern "C" {
 const char* spk_error(){return error.c_str();}
 int spk_init(const char* root){if(initialized)return 1;error.clear();if(!blob.open(std::string(root)+"/spektrafilm_constants.bin",error)||!colour.init(blob,error))return 0;initialized=true;return 1;}
 int spk_prepare(const char* root,const char* film,const char* paper,const char* options){try{error.clear();Json o;if(!Json::parse(options,o,error))return 0;auto next=std::make_unique<Model>();if(!next->setup(root,film,paper,o))return 0;model=std::move(next);return 1;}catch(const std::exception&e){error=e.what();return 0;}}
-const float* spk_gpu_data(){if(!model)return nullptr;pack_model();return packed.data();}
-int spk_gpu_size(){return int(packed.size());}
+int spk_frame(const float*in,float*out,int w,int h,const char*options){try{error.clear();Json o;if(!Json::parse(options,o,error))return 0;const bool ok=frame(in,out,w,h,o);if(cpu)cpu->trim_pool(0);return ok;}catch(const std::exception&e){error=e.what();if(cpu)cpu->trim_pool(0);return 0;}}
+double spk_meter_ev(){return lastMeter;}
+int spk_prophoto_matrix(double*out){Mat3 m;if(!colour.matrix_RGB_to_XYZ("ProPhoto RGB",nullptr,"CAT02",m,error))return 0;m.to_row_major(out);return 1;}
+int spk_grain_probe(float*out,int count,float density,float particles){try{if(count<1||count>1048576||density<=0||density>=1||particles<=0)return 0;if(!cpu)cpu.reset(gpu::create_cpu());std::vector<float>in(size_t(count)*3,density);float lp[12];for(int c=0;c<3;c++){lp[c*4]=0;lp[c*4+1]=1;lp[c*4+2]=particles;lp[c*4+3]=.97f;}uint32_t streams[3]={0,1,2},meta[3]={uint32_t(count),1,0x5EED};auto a=cpu->upload(in.data(),in.size()*4,error),b=cpu->upload(lp,sizeof lp,error),s=cpu->upload(streams,sizeof streams,error),m=cpu->upload(meta,sizeof meta,error),o=cpu->alloc(in.size()*4,error);if(!a||!b||!s||!m||!o)return 0;if(!cpu->dispatch("spk_grain_simple",{gpu::Arg::buf(a),gpu::Arg::buf(b),gpu::Arg::buf(s),gpu::Arg::buf(m),gpu::Arg::buf(o)},count,error))return 0;return cpu->read(o.get(),0,out,in.size()*4,error);}catch(const std::exception&e){error=e.what();return 0;}}
+int spk_convert(const float*in,float*out,int n,const char*src,const char*dst,int encoded){try{Mat3 m;if(!colour.matrix_RGB_to_RGB(src,dst,"CAT02",m,error))return 0;for(int i=0;i<n;i++){double a[3],b[3];for(int c=0;c<3;c++)a[c]=encoded?colour.cctf_decode(in[i*3+c],src):in[i*3+c];m.apply(a,b);for(int c=0;c<3;c++)out[i*3+c]=float(colour.cctf_encode(b[c],dst));}return 1;}catch(const std::exception&e){error=e.what();return 0;}}
 void spk_pixels(const double* input,double* output,int n){if(!model)return;for(int i=0;i<n;i++)model->pixel(input+i*3,output+i*3);}
 int spk_lut(float* output,int size){if(!model||size<2||size>65)return 0;size_t o=0;for(int b=0;b<size;b++)for(int g=0;g<size;g++)for(int r=0;r<size;r++){double in[3],out[3];int q[3]={r,g,b};for(int c=0;c<3;c++)in[c]=(std::exp2(double(q[c])/(size-1)*std::log2(257.))-1.)/16.;model->pixel(in,out);for(double v:out){if(!std::isfinite(v)){error="Non-finite native pointwise result";return 0;}output[o++]=float(v);}output[o++]=1;}return 1;}
 }

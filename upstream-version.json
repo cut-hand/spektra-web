@@ -1,5 +1,5 @@
 {
-  "browser_version": "0.4.0",
+  "browser_version": "0.5.0",
   "checked_on": "2026-10-30",
   "upstream_repository": "https://github.com/JamesQiu2005/SpektraLab",
   "upstream_release": "spektralab-v1.3.4",
@@ -239,7 +239,8 @@
     "manifest": "vendor/spektralab/UPSTREAM.json",
     "emscripten": "4.0.23",
     "adapter": "native/bridge.cpp",
-    "webgpu_shader": "native/pointwise.wgsl",
-    "render_scope": "pointwise material LUT; spatial effects and final sampling retain browser implementations"
+    "render_scope": "original full-frame pipeline and translated Metal kernel bodies; native overscan/date remain unported",
+    "backend": "C++ CPU / WASM; no WebGPU or WebGL",
+    "working_color_space": "ProPhoto RGB"
   }
 }

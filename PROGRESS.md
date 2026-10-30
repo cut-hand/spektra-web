@@ -147,3 +147,18 @@
 - IMG08589.ARW 新核心渲染及 TIFF16 导出已通过独立读取，2048×1366 / 三通道 16 位 / ICC588。
 - 原生源文件、GPU 参考代码与常量更新检查已加入；NATIVE-MIGRATION.md 保存架构、构建、参数映射、差异和后续替换顺序。
 - GitHub 已准备 runtime 目录，编译产物先上传后才原子发布新入口，避免线上入口引用缺失 WASM。
+
+## WASM 全图管线 / ProPhoto RGB（进行中）
+- 用户明确要求停止 WebGPU，直接移植原版技术到 WASM；以此替代先前 WGSL 路线。
+- 已保存原版 pipeline/blur/scene latitude/contrast mask 与 Metal 内核原文；生成器只做地址空间、向量构造及串行调度适配。
+- CPU 后端已通过 clang++ 编译，保留原始 float32 公式、Philox/泊松颗粒、反射边界和双浮点 IIR。
+- 正接入实际照片、ProPhoto 线性输入/工作扫描/最终显示输出及自动测光；尚未验证或发布，不能把编译通过当作完整一致性。
+
+## 0.5.0 全图 WASM / ProPhoto 验证完成
+- 取消 WebGPU/WebGL，原版 C++ run_film/run_print 与核公式直接处理全部照片像素；物理空间散射/反射、DIR 扩散、三子层泊松颗粒、微结构、眩光和锐化已接入。
+- RAW 改为 LibRaw 线性 ProPhoto RGB16，预览最终转 sRGB，TIFF16 保留 ProPhoto RGB ICC；带 ICC TIFF 的宽色域 float 数据也保留。
+- 新默认均衡映射 native balanced，reset 全部使用相同默认。旧明确设置的配方保留。
+- 40 项测试中 39 通过/1 本地 Metal 可选跳过；另单独运行 Metal 门禁 6 项全部通过。无颗粒原版 Metal 全图样本最大误差 4.411e-6；颗粒完整结果不承诺逐像素同粒子，分布矩另验。
+- 五种密度各 65,536 像素的粒子核均值/方差/偏度与独立原版 Metal 相符，通过泊松解析矩门禁。
+- IMG08589.ARW 真实解码和 2048×1366 TIFF 导出完成；独立 Pillow/LittleCMS 读取 ProPhoto ICC596、RGB各16位。
+- 当前准备发布；原生片边/日期、镜头库和 HDR/软打样仍在 FEATURE-GAPS.md 明示。不存在将这些未完成部分声明为已完成。

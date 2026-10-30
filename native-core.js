@@ -1,7 +1,6 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
-import {loadNativeWebGPU} from './native-webgpu.js';
 import createCore from './vendor/spektralab/dist/core.mjs';
-export const nativeCoreVersion='SpektraLab 1.3.4 / C++ WASM pointwise';
+export const nativeCoreVersion='SpektraLab 1.3.4 / C++ WASM full frame / ProPhoto RGB';
 export class NativeCore {
  constructor(module){this.module=module;this.root='/resources';this.key=null;}
  static async load({wasmBinary,readResource,readProfile}={}){
@@ -26,22 +25,17 @@ export class NativeCore {
   const ok=this.module.ccall('spk_prepare','number',['string','string','string','string'],[this.root,film,paper,JSON.stringify(options)]);
   if(!ok)throw Error(this.error());this.key=key;
  }
- gpuData(){const m=this.module,ptr=m._spk_gpu_data(),n=m._spk_gpu_size();return m.HEAPF32.slice(ptr/4,ptr/4+n);}
+
  lut(size=33){const m=this.module,n=size**3*4,ptr=m._malloc(n*4);if(!ptr)throw Error('原生 LUT 内存不足');try{if(!m._spk_lut(ptr,size))throw Error(this.error());return m.HEAPF32.slice(ptr/4,ptr/4+n);}finally{m._free(ptr);}}
  pixels(input){if(input.length%3)throw Error('RGB 输入长度错误');const m=this.module,n=input.length,p=m._malloc(n*8),q=m._malloc(n*8);if(!p||!q){if(p)m._free(p);if(q)m._free(q);throw Error('原生探针内存不足');}try{m.HEAPF64.set(input,p/8);m._spk_pixels(p,q,n/3);return m.HEAPF64.slice(q/8,q/8+n);}finally{m._free(p);m._free(q);}}
+ convert(input,src,dst,encoded=true){const m=this.module,n=input.length,p=m._malloc(n*4),q=m._malloc(n*4);if(!p||!q){if(p)m._free(p);if(q)m._free(q);throw Error('色彩转换内存不足');}try{m.HEAPF32.set(input,p/4);if(!m.ccall('spk_convert','number',['number','number','number','string','string','number'],[p,q,n/3,src,dst,+encoded]))throw Error(this.error());return m.HEAPF32.slice(q/4,q/4+n);}finally{m._free(p);m._free(q);}}
+
+ frame(input,width,height,options={}){if(input.length!==width*height*3)throw Error('原生照片尺寸错误');const m=this.module,n=input.length,p=m._malloc(n*4),q=m._malloc(n*4);if(!p||!q){if(p)m._free(p);if(q)m._free(q);throw Error('WASM 内存不足，请降低输出尺寸');}try{m.HEAPF32.set(input,p/4);if(!m.ccall('spk_frame','number',['number','number','number','number','string'],[p,q,width,height,JSON.stringify(options)]))throw Error(this.error());return {data:m.HEAPF32.slice(q/4,q/4+n),meterEV:m._spk_meter_ev()};}finally{m._free(p);m._free(q);}}
+
 }
 let loading;
 export function loadNativeCore(){return loading ||= NativeCore.load();}
-let gpuDisabled=false,gpuChecked=false;
 export async function buildNativeLUT(film,paper,options={},size=33){
  const core=await loadNativeCore();await core.prepare(film,paper,options);
- let warning=null;
- if(!gpuDisabled)try{
-  const gpu=await loadNativeWebGPU();if(gpu){
-   const data=core.gpuData();
-   if(!gpuChecked){const probe=new Float32Array([0,0,0,.184,.184,.184,1,0,0,0,1,0,0,0,1,16,16,16,.42,.19,.065]),expected=core.pixels(probe),actual=await gpu.run(data,{input:probe});let max=0;for(let i=0;i<expected.length;i++)max=Math.max(max,Math.abs(expected[i]-actual[Math.floor(i/3)*4+i%3]));if(max>3e-5)throw Error('WebGPU 数值自检超出允许误差：'+max);gpuChecked=true;}
-   return {data:await gpu.run(data,{size}),engine:'C++ WASM setup + WebGPU pointwise',warning:null};
-  }
- }catch(e){gpuDisabled=true;warning=e.message;console.warn('WebGPU native pointwise unavailable; using the same C++ WASM adapter:',warning);}
- return {data:core.lut(size),engine:'C++ WASM pointwise',warning};
+ return {data:core.lut(size),engine:'C++ WASM · ProPhoto RGB full frame',warning:null};
 }
