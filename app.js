@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
-import {mountNativeLayout} from './native-layout.js';
+import {mountNativeLayout} from './native-layout.js?v=0.5.5';
 import {clipboardSubset} from './clipboard-groups.js';
 import {Renderer} from './renderer.js';
 import {previewPlan,previewSignature,photoInformation} from './preview-plan.js';
@@ -35,7 +35,9 @@ worker.onmessage=({data})=>{const job=pending.get(data.id);if(!job)return;clearT
 worker.onerror=e=>{for(const job of pending.values()){clearTimeout(job.timer);job.reject(Error(e.message||'处理线程发生错误'));}pending.clear();toast('处理线程出现错误，请刷新页面后重试');};
 const renderer=new Renderer(request),refiner=new PreviewRefiner();
 let detailFrame=null,detailPending=null,detailTimer;
-const refinementStatus=document.createElement('div');refinementStatus.id='refinementStatus';refinementStatus.className='refinement-status';refinementStatus.hidden=true;refinementStatus.setAttribute('role','status');refinementStatus.setAttribute('aria-live','polite');refinementStatus.innerHTML='<span class="spinner" aria-hidden="true"></span><div><strong>正在精化预览</strong><span>清晰图计算中 · 可继续调整</span></div>';$('viewport').append(refinementStatus);
+// Keep screen overlays outside the photo's scroll container.
+const previewFrame=document.createElement('div');previewFrame.className='preview-frame';previewFrame.id='previewFrame';const previewViewport=$('viewport');previewViewport.before(previewFrame);previewFrame.append(previewViewport);const previewHUD=document.createElement('div');previewHUD.id='previewHUD';previewHUD.className='preview-hud';previewFrame.append(previewHUD);previewHUD.append($('busyOverlay'),$('dropOverlay'));
+const refinementStatus=document.createElement('div');refinementStatus.id='refinementStatus';refinementStatus.className='refinement-status';refinementStatus.hidden=true;refinementStatus.setAttribute('role','status');refinementStatus.setAttribute('aria-live','polite');refinementStatus.innerHTML='<span class="spinner" aria-hidden="true"></span><div><strong>正在精化预览</strong><span>清晰图计算中 · 可继续调整</span></div>';previewHUD.append(refinementStatus);
 function clearDetail(){clearTimeout(detailTimer);detailTimer=null;detailPending=null;refiner.cancel();detailFrame=null;refinementStatus.hidden=true;}
 $('engineLabel').textContent=renderer.mode+' · 本地显影';
 function toast(message){clearTimeout(toastTimer);$('toast').textContent=message;$('toast').hidden=false;toastTimer=setTimeout(()=>$('toast').hidden=true,5500);}

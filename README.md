@@ -4,7 +4,7 @@
 
 这是基于 [SpektraLab](https://github.com/JamesQiu2005/SpektraLab) / [spektrafilm](https://github.com/andreavolpato/spektrafilm) 材料数据的独立浏览器移植。**功能和画质一致性是两件事：原版 C++ 全图及空间管线已移植到 WASM；颗粒和部分平台功能仍有明确差异。**
 
-**版本基线：SpektraLab 1.3.4**（标签 `spektralab-v1.3.4`，提交 `fd891c6bc5eb350387602deb5c1ef9b6dcdab948`）；浏览器版 **0.5.4**。34 份材料和目录已逐份比对。对应范围和未实现部分见 [UPSTREAM.md](./UPSTREAM.md)。
+**版本基线：SpektraLab 1.3.4**（标签 `spektralab-v1.3.4`，提交 `fd891c6bc5eb350387602deb5c1ef9b6dcdab948`）；浏览器版 **0.5.5**。34 份材料和目录已逐份比对。对应范围和未实现部分见 [UPSTREAM.md](./UPSTREAM.md)。
 
 在线使用：[GitHub Pages](https://cut-hand.github.io/spektra-web/) · [授权与来源](./NOTICE.html)
 
@@ -105,3 +105,7 @@ Pages 无法配置 COOP/COEP，因此页面使用同源、仅限本项目路径�
 取消所有面板次级菜单，印相紧接胶片；移除放大机光源与说明、照片管理、配方、会话保存和溢出警告。重置与旋转统一为圆弧 SVG，旋转后重置到适合窗口。精化预览使用醒目进度提示。导出下拉框恢复可见文字；生成结果保留下载链接和可见错误，便于手动重试。CPU 缓冲池改为最适合尺寸复用，释放闲置旧尺寸，输入/输出共享 ABI 缓冲；WASM 堆按需增长上限为 2 GiB，以容纳最多 12 MP 的完整管线，低内存设备仍可选择 2048px。
 
 用户选择：待完整 WebGPU 管线及对照验证完成后再展示后端选择器；当前版本仍只运行 C++ WASM，不显示混合模式或占位选项。
+
+### 0.5.5 预览浮层定位
+
+功能差异入口改为带可访问名称与悬停说明的信息 SVG 图标。精化提示、RGB 直方图和处理提示位于照片滚动容器之外的独立浮层，滚轮缩放及左键拖动不会移动这些控件，也不会改变照片的滚动范围。

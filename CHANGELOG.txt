@@ -1,3 +1,8 @@
+0.5.5 (2026-10-30)
+- Replace functional differences text button with an accessible info icon.
+- Anchor refinement, histogram and processing overlays outside photograph scrolling.
+- Verify RAW pan and wheel zoom keep overlay screen coordinates unchanged.
+
 0.5.4 (2026-10-30)
 - Remove rail ellipsis menus; print follows film; remove enlarger illuminant and note.
 - Remove recipe/session/photo management/clipping features; retain core import, selection and clipboard sync.

@@ -203,3 +203,9 @@
 - 49 tests: 48 pass, 1 optional Metal skipped. Existing C++/WASM comparisons pass with in-place ABI.
 - Obvious refining badge (spinner + text), clears on completion/cancel/error, does not intercept pan/zoom.
 - User now permits optional WebGPU, but explicitly chose to show selector ONLY after complete GPU pipeline/parity validation. Full WebGPU not implemented in this release, no partial option.
+
+## 0.5.5 — fixed preview overlays (2026-10-30)
+- Functional differences now uses info SVG, accessible name and title retained.
+- Added fixed-size preview frame and non-interactive overlay sibling of the scrollable photograph viewport. Histogram/refining/busy/drop overlays no longer scroll with the photograph; cancel button remains interactive.
+- RAW IMG08651.ARW browser validation: drag changed photo x278→118, y63→-47 and scroll0/0→160/110; refinement and histogram screen rectangles unchanged. Wheel zoom changed photo to3201x2136 and scroll572.5/436.5; both overlay rectangles remained exactly unchanged. Info icon opens differences modal successfully.
+- JavaScript syntax/diff checks pass. Rendering core/assets unchanged; no new GPU or photographic computation.
