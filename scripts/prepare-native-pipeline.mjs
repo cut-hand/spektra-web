@@ -5,7 +5,7 @@ export function preparePipeline(){
  // Only platform glue changes. Original files are kept byte-for-byte and
  // checked by the build manifest; every scalar/vector formula is retained.
  let common=readFileSync(base+'shaders/spk_common.h','utf8').replace('#include <metal_stdlib>','#include "metal-compat.hpp"').replace('using namespace metal;','');
- const translate=s=>s.replace(/\b(device|thread|kernel)\s+/g,'').replace(/\bconstant\s+/g,'const ').replace(/\[\[.*?\]\]/g,'').replace(/\b(float2|float3|uint2|uint3|uint4)\(/g,'make_$1(');
+ const translate=s=>s.replace(/\bkernel void/g,'inline void').replace(/\b(device|thread|kernel)\s+/g,'').replace(/\bconstant\s+/g,'const ').replace(/\[\[.*?\]\]/g,'').replace(/\b(float2|float3|uint2|uint3|uint4)\(/g,'make_$1(');
  writeFileSync(out+'/spk_common.h',translate(common));
  const names=['nodes','blur','grain','gamut','util','scene_latitude','contrast_mask'];const calls=[];let source='';
  for(const name of names){let s=readFileSync(base+'shaders/'+name+'.metal','utf8');
@@ -23,5 +23,5 @@ export function preparePipeline(){
  writeFileSync(out+'/pipeline.cpp',pipeline);
  let mask=readFileSync(base+'pipeline/contrast_mask.cpp','utf8').replace('#include <dispatch/dispatch.h>','').replace(/    struct Ctx \{ F\* fn; \} ctx\{&fn\};[\s\S]*?\n\}/,'    for(uint32_t line=0;line<lines;line++)fn(line);\n}');
  writeFileSync(out+'/contrast_mask.cpp',mask);
- return [out+'/pipeline.cpp',base+'pipeline/blur.cpp',base+'pipeline/scene_latitude.cpp',out+'/contrast_mask.cpp','native/cpu-backend.cpp','native/overscan-boundary.cpp'];
+ return [out+'/pipeline.cpp',base+'pipeline/blur.cpp',base+'pipeline/scene_latitude.cpp',out+'/contrast_mask.cpp','native/cpu-backend.cpp','native/output-transform.cpp','native/overscan-boundary.cpp'];
 }

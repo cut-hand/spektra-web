@@ -9,6 +9,8 @@
 #include <fstream>
 #include <memory>
 #include <sstream>
+#include <set>
+#include <cstring>
 #include "blob.hpp"
 #include "colour.hpp"
 #include "curves.hpp"
@@ -19,6 +21,7 @@
 #include "setup_cache.hpp"
 #include "pipeline.hpp"
 #include "cpu-backend.hpp"
+#include "output-transform.hpp"
 using namespace spk;
 namespace {
 std::string error;
@@ -145,7 +148,15 @@ struct Model{
 };
 std::unique_ptr<Model> model;
 std::unique_ptr<gpu::Gpu> cpu;
-double lastMeter=0;
+double lastMeter=0;uint64_t modelGeneration=0;bool lastFrameCacheHit=false;
+struct FrameMemo {uint64_t generation=0;uint32_t w=0,h=0;std::string key;std::vector<float> input,scan;double meter=0;};
+FrameMemo frameMemo;
+const std::set<std::string> outputKeys={"exposure","temperature","postTint","contrast","saturation","curveShadows","curveMid","curveHighlights","balanceR","balanceG","balanceB","shadowR","shadowG","shadowB","highlightR","highlightG","highlightB","vignette","targetColorSpace","compare","split","disableFrameCache","referenceOutputTransform"};
+std::string nativeFrameKey(const Json&o){Json k=Json::object();for(const auto&[name,v]:o.fields())if(!outputKeys.count(name))k.set(name,v);return k.dump();}
+struct Grade {
+ double gain[3],contrast,saturation,curve[3],balance[3],shadow[3],highlight[3],vignette;bool encoded=false,curves=false;
+ explicit Grade(const Json&o){auto get=[&](const char*k){return o.at(k).as_double(0);};double exp=std::exp2(get("exposure"));gain[0]=exp*(1+get("temperature")*.002);gain[1]=exp*std::exp2(-get("postTint")/150.);gain[2]=exp*(1-get("temperature")*.002);contrast=1+get("contrast")/100.;saturation=1+get("saturation")/100.;vignette=get("vignette")/100.;const char*ck[]={"curveShadows","curveMid","curveHighlights"},*bk[]={"balanceR","balanceG","balanceB"},*sk[]={"shadowR","shadowG","shadowB"},*hk[]={"highlightR","highlightG","highlightB"};for(int c=0;c<3;c++){curve[c]=get(ck[c]);balance[c]=get(bk[c]);shadow[c]=get(sk[c]);highlight[c]=get(hk[c]);curves|=curve[c]!=0;encoded|=curve[c]!=0||balance[c]!=0||shadow[c]!=0||highlight[c]!=0;}encoded|=contrast!=1||saturation!=1;}
+};
 double value(const Json&o,const char*k,double d){return o.at(k).as_double(d);}
 bool frame(const float*input,float*output,uint32_t w,uint32_t h,const Json&o){
  if(!model){error="Native model is not prepared";return false;}
@@ -180,10 +191,14 @@ bool frame(const float*input,float*output,uint32_t w,uint32_t h,const Json&o){
  auto&sl=p.camera.scene_latitude;sl.highlight_room=value(o,"sceneHighlights",0);sl.shadow_room=value(o,"sceneShadows",0);sl.active=sl.highlight_room>0||sl.shadow_room>0;
  p.scanner.unsharp_mask[1]=value(o,"sharpen",0)/100.;
  const double pg=value(o,"paperGamma",1);if(pg!=1){p.print_render.density_curves_morph.active=true;p.print_render.density_curves_morph.gamma_factor=pg;}
+ Mat3 convert;std::vector<float> scanPixels;Image uncachedScan;
+ const size_t elements=size_t(w)*h*3;const bool memoAllowed=size_t(w)*h<=1000000&&!o.at("disableFrameCache").as_bool(false);const auto memoKey=nativeFrameKey(o);
+ lastFrameCacheHit=memoAllowed&&frameMemo.generation==modelGeneration&&frameMemo.w==w&&frameMemo.h==h&&frameMemo.key==memoKey&&frameMemo.input.size()==elements&&std::memcmp(frameMemo.input.data(),input,elements*sizeof(float))==0;
+ if(!lastFrameCacheHit){
  Pipeline pipe(cpu.get(),&colour,&blob,&cache);if(!pipe.build(p,error))return false;
  const auto src=o.at("sourceColorSpace").is_string()?o.at("sourceColorSpace").as_string():"sRGB";
  const bool encoded=o.at("sourceEncoded").as_bool(true);
- Mat3 convert;if(!colour.matrix_RGB_to_RGB(src,"ProPhoto RGB","CAT02",convert,error))return false;
+ if(!colour.matrix_RGB_to_RGB(src,"ProPhoto RGB","CAT02",convert,error))return false;
  Image in;in.w=w;in.h=h;in.c=3;in.buf=cpu->alloc(in.bytes(),error);if(!in.buf)return false;
  auto*linear=static_cast<float*>(cpu->contents(in.buf.get()));
  const Json& gain=o.at("cameraGains");double gains[3]={1,1,1};if(gain.is_array()&&gain.items().size()==3)for(int c=0;c<3;c++)gains[c]=gain.items()[c].as_double(1);
@@ -191,26 +206,36 @@ bool frame(const float*input,float*output,uint32_t w,uint32_t h,const Json&o){
  pipe.set_source_long_edge(uint32_t(value(o,"sourceLongEdge",std::max(w,h))),uint32_t(value(o,"frameLongEdge",std::max(w,h))));
  if(p.camera.auto_exposure){double ev;if(!pipe.measure_exposure_ev(in,ev,error,true))return false;pipe.set_auto_exposure_ev(ev);lastMeter=ev;}else lastMeter=0;
  Image negative,scan;if(!pipe.run_film(in,negative,nullptr,error)||!pipe.run_print(negative,scan,nullptr,error))return false;
- const auto*rgb=static_cast<const float*>(cpu->contents(scan.buf.get()));
+ if(memoAllowed){const auto*result=static_cast<const float*>(cpu->contents(scan.buf.get()));scanPixels.assign(result,result+size_t(w)*h*3);}else uncachedScan=scan;
+
+  if(memoAllowed){frameMemo.generation=modelGeneration;frameMemo.w=w;frameMemo.h=h;frameMemo.key=memoKey;frameMemo.input.assign(input,input+elements);frameMemo.scan=std::move(scanPixels);frameMemo.meter=lastMeter;}
+  else frameMemo=FrameMemo{};
+ }else lastMeter=frameMemo.meter;
+ const float*rgb=memoAllowed?frameMemo.scan.data():static_cast<const float*>(cpu->contents(uncachedScan.buf.get()));
  const auto dst=o.at("targetColorSpace").is_string()?o.at("targetColorSpace").as_string():"sRGB";
  if(!colour.matrix_RGB_to_RGB("ProPhoto RGB",dst,"CAT02",convert,error))return false;
  // The app's output transform occurs once, after the completed ProPhoto
  // scan. Same CAT02/CAM16/CCTF contract as spk_output_transform upstream.
  Model transform;transform.p.io.output_gamut_compress=GamutCompressSpec::output_default();const Cam16Setup* cm=nullptr;
  if(dst!="ProPhoto RGB"&&!cache.cam16(colour,dst,cm,error))return false;if(cm)transform.cam=*cm;
+ const Grade grade(o);const bool kernelOutput=cm&&!model->isDI&&!o.at("referenceOutputTransform").as_bool(false);
  for(size_t i=0;i<size_t(w)*h;i++){
   double lin[3],dest[3];if(model->isDI){for(int c=0;c<3;c++)output[i*3+c]=rgb[i*3+c];continue;}
   for(int c=0;c<3;c++)lin[c]=colour.cctf_decode(rgb[i*3+c],"ProPhoto RGB");
-  // Existing browser creative controls, in the wide working space. Zero
-  // controls are an identity. These are not claimed as native app grading.
-  for(int c=0;c<3;c++){double temp=c==0?1+value(o,"temperature",0)*.002:c==2?1-value(o,"temperature",0)*.002:std::exp2(-value(o,"postTint",0)/150.);lin[c]*=std::exp2(value(o,"exposure",0))*temp;}
-  double enc[3];for(int c=0;c<3;c++)enc[c]=colour.cctf_encode(lin[c],"ProPhoto RGB");
-  double luma=enc[0]*.28804+enc[1]*.71187+enc[2]*.00009;
-  for(int c=0;c<3;c++){double v=(enc[c]-.5)*(1+value(o,"contrast",0)/100.)+.5;v=luma+(v-luma)*(1+value(o,"saturation",0)/100.);double t=v;v+=4*t*(1-t)*(value(o,"curveShadows",0)*std::exp(-std::pow((t-.2)/.18,2))+value(o,"curveMid",0)*std::exp(-std::pow((t-.5)/.2,2))+value(o,"curveHighlights",0)*std::exp(-std::pow((t-.8)/.18,2)))*.004;const char*bal[3]={"balanceR","balanceG","balanceB"},*sh[3]={"shadowR","shadowG","shadowB"},*hi[3]={"highlightR","highlightG","highlightB"};v+=(value(o,bal[c],0)+value(o,sh[c],0)*std::pow(1-clamp(luma),2)+value(o,hi[c],0)*std::pow(clamp(luma),2))*.003;lin[c]=colour.cctf_decode(v,"ProPhoto RGB");}
-  convert.apply(lin,dest);if(cm)transform.compress(dest);
-  double x=(double(i%w)+.5)/w-.5,y=(double(i/w)+.5)/h-.5,vig=1.-value(o,"vignette",0)/100.*clamp((x*x+y*y)*1.5);
+  for(int c=0;c<3;c++)lin[c]*=grade.gain[c];
+  if(grade.encoded){
+   double enc[3];for(int c=0;c<3;c++)enc[c]=colour.cctf_encode(lin[c],"ProPhoto RGB");
+   const double luma=enc[0]*.28804+enc[1]*.71187+enc[2]*.00009,low=std::pow(1-clamp(luma),2),high=std::pow(clamp(luma),2);
+   for(int c=0;c<3;c++){double v=(enc[c]-.5)*grade.contrast+.5;v=luma+(v-luma)*grade.saturation;
+    if(grade.curves){const double t=v;v+=4*t*(1-t)*(grade.curve[0]*std::exp(-std::pow((t-.2)/.18,2))+grade.curve[1]*std::exp(-std::pow((t-.5)/.2,2))+grade.curve[2]*std::exp(-std::pow((t-.8)/.18,2)))*.004;}
+    v+=(grade.balance[c]+grade.shadow[c]*low+grade.highlight[c]*high)*.003;lin[c]=colour.cctf_decode(v,"ProPhoto RGB");
+   }
+  }
+  convert.apply(lin,dest);if(kernelOutput){for(int c=0;c<3;c++)output[i*3+c]=float(dest[c]);continue;}if(cm)transform.compress(dest);
+  double vig=1.;if(grade.vignette!=0){double x=(double(i%w)+.5)/w-.5,y=(double(i/w)+.5)/h-.5;vig-=grade.vignette*clamp((x*x+y*y)*1.5);}
   for(int c=0;c<3;c++){double v=colour.cctf_encode(dest[c]*vig,dst);if(!std::isfinite(v)){error="Non-finite native output";return false;}output[i*3+c]=float(v);}
  }
+ if(kernelOutput)encode_display(output,w,h,transform.cam,transform.p.io.output_gamut_compress,cctf_mode_for(dst),grade.vignette);
  return true;
 }
 
@@ -218,9 +243,10 @@ bool frame(const float*input,float*output,uint32_t w,uint32_t h,const Json&o){
 extern "C" {
 const char* spk_error(){return error.c_str();}
 int spk_init(const char* root){if(initialized)return 1;error.clear();if(!blob.open(std::string(root)+"/spektrafilm_constants.bin",error)||!colour.init(blob,error))return 0;initialized=true;return 1;}
-int spk_prepare(const char* root,const char* film,const char* paper,const char* options){try{error.clear();Json o;if(!Json::parse(options,o,error))return 0;auto next=std::make_unique<Model>();if(!next->setup(root,film,paper,o))return 0;model=std::move(next);return 1;}catch(const std::exception&e){error=e.what();return 0;}}
+int spk_prepare(const char* root,const char* film,const char* paper,const char* options){try{error.clear();Json o;if(!Json::parse(options,o,error))return 0;auto next=std::make_unique<Model>();if(!next->setup(root,film,paper,o))return 0;model=std::move(next);++modelGeneration;return 1;}catch(const std::exception&e){error=e.what();return 0;}}
 int spk_frame(const float*in,float*out,int w,int h,const char*options){try{error.clear();Json o;if(!Json::parse(options,o,error))return 0;const bool ok=frame(in,out,w,h,o);if(cpu)cpu->trim_pool(0);return ok;}catch(const std::exception&e){error=e.what();if(cpu)cpu->trim_pool(0);return 0;}}
 double spk_meter_ev(){return lastMeter;}
+int spk_frame_cache_hit(){return lastFrameCacheHit;}
 int spk_prophoto_matrix(double*out){Mat3 m;if(!colour.matrix_RGB_to_XYZ("ProPhoto RGB",nullptr,"CAT02",m,error))return 0;m.to_row_major(out);return 1;}
 int spk_grain_probe(float*out,int count,float density,float particles){try{if(count<1||count>1048576||density<=0||density>=1||particles<=0)return 0;if(!cpu)cpu.reset(gpu::create_cpu());std::vector<float>in(size_t(count)*3,density);float lp[12];for(int c=0;c<3;c++){lp[c*4]=0;lp[c*4+1]=1;lp[c*4+2]=particles;lp[c*4+3]=.97f;}uint32_t streams[3]={0,1,2},meta[3]={uint32_t(count),1,0x5EED};auto a=cpu->upload(in.data(),in.size()*4,error),b=cpu->upload(lp,sizeof lp,error),s=cpu->upload(streams,sizeof streams,error),m=cpu->upload(meta,sizeof meta,error),o=cpu->alloc(in.size()*4,error);if(!a||!b||!s||!m||!o)return 0;if(!cpu->dispatch("spk_grain_simple",{gpu::Arg::buf(a),gpu::Arg::buf(b),gpu::Arg::buf(s),gpu::Arg::buf(m),gpu::Arg::buf(o)},count,error))return 0;return cpu->read(o.get(),0,out,in.size()*4,error);}catch(const std::exception&e){error=e.what();return 0;}}
 int spk_convert(const float*in,float*out,int n,const char*src,const char*dst,int encoded){try{Mat3 m;if(!colour.matrix_RGB_to_RGB(src,dst,"CAT02",m,error))return 0;for(int i=0;i<n;i++){double a[3],b[3];for(int c=0;c<3;c++)a[c]=encoded?colour.cctf_decode(in[i*3+c],src):in[i*3+c];m.apply(a,b);for(int c=0;c<3;c++)out[i*3+c]=float(colour.cctf_encode(b[c],dst));}return 1;}catch(const std::exception&e){error=e.what();return 0;}}

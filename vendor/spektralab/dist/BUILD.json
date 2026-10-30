@@ -1,13 +1,13 @@
 {
   "upstream_commit": "fd891c6bc5eb350387602deb5c1ef9b6dcdab948",
   "emscripten": "4.0.23",
-  "adapter_sha256": "173564e0bb0ab5ea6d2384b02303851de044f003c4c26ab242047ac1459a3754",
+  "adapter_sha256": "0a3e71422eb38ede822543aed488c2c8be6030cfdb99940391c7ef967f98c948",
   "backend": "C++ CPU / WASM (no graphics API)",
   "kernel_adapter_sha256": "a62065e309610f5c05ecbde00635eeb541e4bdd52cb9ff21bd7d014ae08a12d6",
-  "generator_sha256": "75899bb7ae7a0a4454fcce340a1ecadc62086c680efa839eb6ed4ca4010814f1",
+  "generator_sha256": "36f237ef6531d908e599a94c0620d71c34ea3695a06c095a26614a888aac7ad1",
   "files": {
-    "core.mjs": "a72122542ae7b1e21edf6cb20c6d2ba08851d8820dd804a6e1bcdf8039f37716",
-    "core.wasm": "425cdb76a93de819cea640892491962b4709a55a0d8c903e3dc9602d062faea7",
+    "core.mjs": "0e677a27356c70a3e7df150b09f4bce613fdbec0dcd7eacb55fcfc3fc9282092",
+    "core.wasm": "477aad8df37f0761ce90e5230874615e01b01a07c5cd0c35dd82edddc3d083ff",
     "spektrafilm_constants.bin": "f2c06600606fa169171f58b6639d2669f372a2b39ebe9c72e3edeff5f6d7d31d"
   }
 }

@@ -4,7 +4,7 @@
 
 这是基于 [SpektraLab](https://github.com/JamesQiu2005/SpektraLab) / [spektrafilm](https://github.com/andreavolpato/spektrafilm) 材料数据的独立浏览器移植。**功能和画质一致性是两件事：原版 C++ 全图及空间管线已移植到 WASM；颗粒和部分平台功能仍有明确差异。**
 
-**版本基线：SpektraLab 1.3.4**（标签 `spektralab-v1.3.4`，提交 `fd891c6bc5eb350387602deb5c1ef9b6dcdab948`）；浏览器版 **0.5.0**。34 份材料和目录已逐份比对。对应范围和未实现部分见 [UPSTREAM.md](./UPSTREAM.md)。
+**版本基线：SpektraLab 1.3.4**（标签 `spektralab-v1.3.4`，提交 `fd891c6bc5eb350387602deb5c1ef9b6dcdab948`）；浏览器版 **0.5.1**。34 份材料和目录已逐份比对。对应范围和未实现部分见 [UPSTREAM.md](./UPSTREAM.md)。
 
 在线使用：[GitHub Pages](https://cut-hand.github.io/spektra-web/) · [授权与来源](./NOTICE.html)
 
@@ -30,7 +30,7 @@ CineStill 800T 按原项目规则继承 Vision3 500T 数值并选择移除防光
 
 ## 布局与对应范围
 
-0.5.0 按原版重排为紧凑灰色三栏：左侧导航、设置剪贴板、胶片、片边、日期后背、印相、裁剪、放大机；右侧显影前按宽容度、输入/相机、胶片画幅、场景置位排列，显影后单独分组；其他控制由对应的 ⋯ 菜单访问。文件信息位于顶部，底部只保留缩略图带。材料使用分组文字列表。详细未实现、部分实现和近似算法见 [FEATURE-GAPS.md](./FEATURE-GAPS.md)。
+0.5.1 按原版重排为紧凑灰色三栏：左侧导航、设置剪贴板、胶片、片边、日期后背、印相、裁剪、放大机；右侧显影前按宽容度、输入/相机、胶片画幅、场景置位排列，显影后单独分组；其他控制由对应的 ⋯ 菜单访问。文件信息位于顶部，底部只保留缩略图带。材料使用分组文字列表。详细未实现、部分实现和近似算法见 [FEATURE-GAPS.md](./FEATURE-GAPS.md)。
 
 ## 工作流
 
@@ -51,7 +51,7 @@ CineStill 800T 按原项目规则继承 Vision3 500T 数值并选择移除防光
 - Cube 只包含色彩变换，输入/输出均为编码 sRGB；不包含测光及任何空间效果、日期和片边。数字中间片为实验性 Cineon-style log；DI TIFF 不附 sRGB ICC，JPEG/PNG 仅供查看，不用于 Log 数据交换。
 - ZIP 总体积限制为 512 MB，避免浏览器耗尽内存；超过请分批导出。输出不复制原始 EXIF/GPS。
 - TIFF 输入支持未压缩、Deflate、PackBits 的 8/16 位交错 RGB/灰度条带，以及常见 RGB 矩阵 ICC / 灰度 ICC。暂不支持 BigTIFF、LZW/JPEG 压缩、CMYK、浮点、平面或拼块 TIFF；没有 ICC 的 TIFF 按 sRGB 解释。
-- 全部显影使用 C++ WASM CPU Worker，不请求 WebGPU/WebGL；交互预览长边 900px，速度受 CPU 影响。
+- 全部显影使用 C++ WASM CPU Worker，不请求 WebGPU/WebGL；拖动预览长边480px，停止后恢复900px，速度受 CPU 影响。
 - 已复用原版 Hanatos / 曲线 / 光谱 / CAM16 数学核心，已接入 DIR 扩散、三子层泊松颗粒与原版多次散射，仍缺原生片边/日期、自动镜头数据库校正及原生 HDR/EDR 显示。当前 EDR 是浏览器 SDR 映射；不能当作 HDR 输出。
 
 ## 本地运行与测试
@@ -85,4 +85,6 @@ Pages 无法配置 COOP/COEP，因此页面使用同源、仅限本项目路径�
 
 ## 原生核心移植
 
-0.5.0 保留界面，直接将原版 C++ 管线与 Metal 内核公式编译为 WASM CPU 运算。原版 ProPhoto RGB 工作空间、全图光谱处理和空间效果用于实际照片；预览/导出只在最后转换目标空间。移除了 WebGPU/WebGL，不再以 LUT 渲染照片。重建、对照与剩余差异见 [NATIVE-MIGRATION.md](./NATIVE-MIGRATION.md)。
+0.5.1 保留界面，直接将原版 C++ 管线与 Metal 内核公式编译为 WASM CPU 运算。原版 ProPhoto RGB 工作空间、全图光谱处理和空间效果用于实际照片；预览/导出只在最后转换目标空间。移除了 WebGPU/WebGL，不再以 LUT 渲染照片。重建、对照与剩余差异见 [NATIVE-MIGRATION.md](./NATIVE-MIGRATION.md)。
+
+0.5.1 优化：调色复用原生 ProPhoto 扫描、对比复用现有画面、请求合并、拖动快速预览与清晰预览自动切换。导出尺寸与色彩空间保持不变。性能与颜色回归详见 [NATIVE-MIGRATION.md](./NATIVE-MIGRATION.md)。

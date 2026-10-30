@@ -1,0 +1,10 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>WASM 交互性能回归</title><style>body{background:#222;color:#eee;font:15px system-ui}canvas{width:600px;max-width:90vw}pre{white-space:pre-wrap}</style><button id="run">运行性能与对比缓存验证</button><canvas id="view"></canvas><pre id="result">等待运行</pre><script type="module">
+import {Renderer} from '../renderer.js';import {defaults} from '../settings.js';
+const worker=new Worker('../engine-worker.js',{type:'module'}),pending=new Map();let id=0;worker.onmessage=({data:r})=>{const p=pending.get(r.id);if(p){pending.delete(r.id);r.error?p.reject(Error(r.error)):p.resolve(r);}};const request=m=>new Promise((resolve,reject)=>{pending.set(++id,{resolve,reject});worker.postMessage({...m,id});});
+const renderer=new Renderer(request);document.querySelector('#run').onclick=async()=>{const report=[];try{const image=new Image();image.src='../assets/demo.jpg';await image.decode();const source=document.createElement('canvas');source.width=900;source.height=600;source.getContext('2d').drawImage(image,0,0,900,600);const p={...defaults,compare:0,split:.5};await request({type:'prepare',film:p.film,paper:p.paper,options:p});
+ const run=async(name,params)=>{const start=performance.now(),c=await renderer.render(source,params);const view=document.querySelector('#view');view.width=c.width;view.height=c.height;view.getContext('2d').drawImage(c,0,0);report.push({name,ms:performance.now()-start,nativeCalls:renderer.nativeCalls});return c;};
+ await run('initial',p);await run('postExposure',{...p,exposure:1});const count=renderer.nativeCalls;
+ for(let i=0;i<20;i++)await run('split'+i,{...p,exposure:1,compare:1,split:i/20});await run('original',{...p,compare:2});await run('restore',{...p,exposure:1});if(renderer.nativeCalls!==count)throw Error('对比重跑了WASM');
+ document.querySelector('#result').textContent=JSON.stringify({passed:true,report},null,2);
+ }catch(e){document.querySelector('#result').textContent=JSON.stringify({passed:false,error:e.message,report});}};
+</script></html>

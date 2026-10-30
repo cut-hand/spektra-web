@@ -5,7 +5,7 @@ const luminance=rgb=>.2126*decode(rgb[0])+.7152*decode(rgb[1])+.0722*decode(rgb[
 
 // This is the browser model's own usable tone range, not native-engine latitude.
 export function latitudeWindow(lut){
- const values=Array.from({length:113},(_,i)=>{const ev=-8+i/8,v=.184*2**ev;return luminance(sampleLUT(lut,[v,v,v]));});
+ const values=Array.from({length:113},(_,i)=>{const ev=-8+i/8,v=.184*2**ev;return luminance(lut.neutral?Array.from(lut.neutral.subarray(i*3,i*3+3)):sampleLUT(lut,[v,v,v]));});
  const slopes=values.slice(1).map((v,i)=>Math.max(0,v-values[i]));
  const peak=Math.max(...slopes),range=fraction=>{const ids=slopes.map((v,i)=>v>=peak*fraction&&v>1e-8?i:-1).filter(i=>i>=0);return ids.length?[-8+ids[0]/8,-8+(ids.at(-1)+1)/8]:[-8,6];};
  return {usable:range(.05),full:range(.25)};
@@ -13,10 +13,10 @@ export function latitudeWindow(lut){
 
 export function mountLatitudeView(container){
  const root=document.createElement('div');root.className='latitude-view';root.innerHTML='<canvas id="latitudeHistogram" width="640" height="170" aria-label="场景曝光档位直方图，浏览器模型近似"></canvas><div class="latitude-ramp"></div><div class="latitude-axis">'+[-8,-6,-4,-2,0,2,4,6,8].map(n=>'<span>'+(n>0?'+':'')+n+'</span>').join('')+'</div><div class="latitude-coverage"><span>低于 <b id="latitudeLow">—</b></span><span>范围内 <b id="latitudeInside">—</b></span><span>高于 <b id="latitudeHigh">—</b></span></div><div id="latitudeLimits" class="latitude-limits">显影后即可按当前胶片与相纸测量。</div>';
- container.append(root);const canvas=root.querySelector('canvas'),ctx=canvas.getContext('2d');let previousLUT=null,window=null;
+ container.append(root);const canvas=root.querySelector('canvas'),ctx=canvas.getContext('2d');let previousLUT=null,window=null,previousSource=null,previousExposureKey='';
  const stops=x=>(x>=0?'+':'')+x.toFixed(2);
  return {update(source,lut,params){
-  if(!lut)return;if(lut!==previousLUT){window=latitudeWindow(lut);previousLUT=lut;}
+  if(!lut)return;const exposureKey=JSON.stringify(['cameraTemperature','cameraTint','cameraExposure','meterEV','headroom','sceneHighlights','sceneShadows'].map(k=>params[k]));if(source===previousSource&&lut===previousLUT&&exposureKey===previousExposureKey)return;previousSource=source;previousExposureKey=exposureKey;if(lut!==previousLUT){window=latitudeWindow(lut);previousLUT=lut;}
   const small=document.createElement('canvas');small.width=160;small.height=Math.max(1,Math.round(160*source.height/source.width));const c=small.getContext('2d',{willReadFrequently:true});c.drawImage(source,0,0,small.width,small.height);const data=c.getImageData(0,0,small.width,small.height).data,bins=new Uint32Array(161);let below=0,above=0,total=0;
   for(let i=0;i<data.length;i+=4){const lin=preEffects([data[i]/255,data[i+1]/255,data[i+2]/255],params),y=Math.max(1e-8,.2126*lin[0]+.7152*lin[1]+.0722*lin[2]),ev=Math.log2(y/.184);bins[Math.max(0,Math.min(160,Math.floor((ev+8)*10)))]++;if(ev<window.usable[0])below++;else if(ev>window.usable[1])above++;total++;}
   const w=canvas.width,h=canvas.height,max=Math.max(1,...bins),x=ev=>(ev+8)/16*w;ctx.clearRect(0,0,w,h);ctx.fillStyle='#1e1f1d';ctx.fillRect(0,0,w,h);ctx.fillStyle='#ffffff08';ctx.fillRect(x(window.usable[0]),0,x(window.usable[1])-x(window.usable[0]),h);
