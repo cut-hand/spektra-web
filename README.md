@@ -1,10 +1,10 @@
 # Spektra 浏览器胶片暗房
 
-无需安装原生应用的本地照片暗房。静态 HTML、JavaScript、WebGL 2 与 LibRaw WebAssembly；照片不发送到服务器。可部署到 GitHub Pages 的仓库根目录或子路径。
+无需安装原生应用的本地照片暗房。静态 HTML、JavaScript、C++ WebAssembly、WebGPU / WebGL 2 与 LibRaw WebAssembly；照片不发送到服务器。可部署到 GitHub Pages 的仓库根目录或子路径。
 
-这是基于 [SpektraLab](https://github.com/JamesQiu2005/SpektraLab) / [spektrafilm](https://github.com/andreavolpato/spektrafilm) 材料数据的独立浏览器移植。**功能和画质一致性是两件事：当前光谱重建及空间效果仍有独立实现，尚不能宣称原生引擎逐像素一致。**
+这是基于 [SpektraLab](https://github.com/JamesQiu2005/SpektraLab) / [spektrafilm](https://github.com/andreavolpato/spektrafilm) 材料数据的独立浏览器移植。**功能和画质一致性是两件事：C++ 数学核心已移植，但完整渲染与空间效果仍有差异，尚不能宣称原生引擎逐像素一致。**
 
-**版本基线：SpektraLab 1.3.4**（标签 `spektralab-v1.3.4`，提交 `fd891c6bc5eb350387602deb5c1ef9b6dcdab948`）；浏览器版 **0.3.1**。34 份材料和目录已逐份比对。对应范围和未实现部分见 [UPSTREAM.md](./UPSTREAM.md)。
+**版本基线：SpektraLab 1.3.4**（标签 `spektralab-v1.3.4`，提交 `fd891c6bc5eb350387602deb5c1ef9b6dcdab948`）；浏览器版 **0.4.0**。34 份材料和目录已逐份比对。对应范围和未实现部分见 [UPSTREAM.md](./UPSTREAM.md)。
 
 在线使用：[GitHub Pages](https://cut-hand.github.io/spektra-web/) · [授权与来源](./NOTICE.html)
 
@@ -30,7 +30,7 @@ CineStill 800T 按原项目规则继承 Vision3 500T 数值并选择移除防光
 
 ## 布局与对应范围
 
-0.3.1 按原版重排为紧凑灰色三栏：左侧导航、设置剪贴板、胶片、片边、日期后背、印相、裁剪、放大机；右侧显影前按宽容度、输入/相机、胶片画幅、场景置位排列，显影后单独分组；其他控制由对应的 ⋯ 菜单访问。文件信息位于顶部，底部只保留缩略图带。材料使用分组文字列表。详细未实现、部分实现和近似算法见 [FEATURE-GAPS.md](./FEATURE-GAPS.md)。
+0.4.0 按原版重排为紧凑灰色三栏：左侧导航、设置剪贴板、胶片、片边、日期后背、印相、裁剪、放大机；右侧显影前按宽容度、输入/相机、胶片画幅、场景置位排列，显影后单独分组；其他控制由对应的 ⋯ 菜单访问。文件信息位于顶部，底部只保留缩略图带。材料使用分组文字列表。详细未实现、部分实现和近似算法见 [FEATURE-GAPS.md](./FEATURE-GAPS.md)。
 
 ## 工作流
 
@@ -52,11 +52,11 @@ CineStill 800T 按原项目规则继承 Vision3 500T 数值并选择移除防光
 - ZIP 总体积限制为 512 MB，避免浏览器耗尽内存；超过请分批导出。输出不复制原始 EXIF/GPS。
 - TIFF 输入支持未压缩、Deflate、PackBits 的 8/16 位交错 RGB/灰度条带，以及常见 RGB 矩阵 ICC / 灰度 ICC。暂不支持 BigTIFF、LZW/JPEG 压缩、CMYK、浮点、平面或拼块 TIFF；没有 ICC 的 TIFF 按 sRGB 解释。
 - WebGL 2 不可用时回退 CPU Worker，速度会降低，空间采样与 GPU 路径存在差异。
-- 尚未实现原版 Hanatos / DIR / CAM16 全部数值路径、原版颗粒与多次散射模型、自动镜头数据库校正及原生 HDR/EDR 显示。当前 EDR 是浏览器 SDR 映射；不能当作 HDR 输出。
+- 已复用原版 Hanatos / 曲线 / 光谱 / CAM16 数学核心，仍缺完整 DIR 空间扩散、原版颗粒与多次散射模型、自动镜头数据库校正及原生 HDR/EDR 显示。当前 EDR 是浏览器 SDR 映射；不能当作 HDR 输出。
 
 ## 本地运行与测试
 
-需要 Node.js 20 或更新版本，无需安装 npm 依赖：
+发布仓库已包含编译产物，日常预览无需 npm 依赖。修改 C++ 后先按 [原生核心重建说明](./NATIVE-MIGRATION.md) 编译 WASM 和宿主探针；运行完整测试需要该探针。需要 Node.js 20 或更新版本：
 
 ```sh
 node server.mjs
@@ -77,8 +77,12 @@ Pages 无法配置 COOP/COEP，因此页面使用同源、仅限本项目路径�
 
 ## 授权
 
-网页实现：GPL-3.0-or-later。28 份上游材料：Andrea Volpato，CC BY-SA 4.0；数值未改，仅紧凑排版。材料与导出 LUT 的变更记录见 [CHANGELOG.txt](./CHANGELOG.txt)。产品新增材料的来源和假设见 `licenses/PRODUCT-PROFILES-NOTICE.md`。LibRaw-Wasm、LibRaw、Little CMS、coi-serviceworker 的授权与可重建来源见 [NOTICE.html](./NOTICE.html)。生成的 sRGB ICC 为 Little CMS 创建的标准 sRGB 配置。
+网页与 C++ 实现：GPL-3.0-or-later。28 份上游材料：Andrea Volpato，CC BY-SA 4.0；数值未改，仅紧凑排版。材料与导出 LUT 的变更记录见 [CHANGELOG.txt](./CHANGELOG.txt)。产品新增材料的来源和假设见 `licenses/PRODUCT-PROFILES-NOTICE.md`。LibRaw-Wasm、LibRaw、Little CMS、coi-serviceworker 的授权与可重建来源见 [NOTICE.html](./NOTICE.html)。生成的 sRGB ICC 为 Little CMS 创建的标准 sRGB 配置。
 
 ## 后续跟进上游
 
 运行 `npm run check:upstream` 检查最新正式发布，或 `node scripts/check-upstream.mjs --ref main` 检查开发分支。只生成版本、材料与许可差异报告，不自动覆盖当前代码。升级、回归与回退步骤见 [UPDATING.md](./UPDATING.md)。
+
+## 原生核心移植
+
+0.4.0 保留界面，用原版 C++ 数学核心替换正式渲染的三基谱模型；WebGPU 逐点内核用于生成材料 LUT，缺失/自检失败时使用同一 C++ WASM 路径。预览的 33³ LUT 插值和 WebGL 空间效果仍存在。不能将逐点探针通过解释为完整原版画质一致。源码、重建、验证及后续阶段见 [NATIVE-MIGRATION.md](./NATIVE-MIGRATION.md)。

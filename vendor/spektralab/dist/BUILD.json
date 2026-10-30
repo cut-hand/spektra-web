@@ -1,0 +1,11 @@
+{
+  "upstream_commit": "fd891c6bc5eb350387602deb5c1ef9b6dcdab948",
+  "emscripten": "4.0.23",
+  "adapter_sha256": "22fd15074d2cfc499c8acb57bf1a55988dcc622a282738e472a58f2fbf9abcb1",
+  "wgsl_sha256": "c54cbf9aa5e0b1442c3108f7f55ee07a6999c3666d7eecfd9d81a4a2c08e2c40",
+  "files": {
+    "core.mjs": "a1482a4e9982dd3b3d58d1b53772f1e206abe1d63861843ef6edce48f6aa2bc6",
+    "core.wasm": "db71f277ab39943c30343dd0805a3e99ec1e292afecf85e22f21057e7ae8bbd4",
+    "spektrafilm_constants.bin": "f2c06600606fa169171f58b6639d2669f372a2b39ebe9c72e3edeff5f6d7d31d"
+  }
+}

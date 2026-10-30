@@ -30,3 +30,7 @@ node scripts/check-upstream.mjs --ref spektralab-v1.3.4
 Pages 使用 `main` 根目录，所有资源采用相对路径；需在实际 `/spektra-web/` 子路径测试首次 Service Worker 引导与 RAW 解码。发布前用 `git diff --stat`、`git ls-files` 检查仓库内容，排除用户原片、测试导出、凭证和机器路径。
 
 为每个稳定浏览器版保留提交或标签。发现回归时用 `git revert` 回退相关提交并重新部署；保留升级报告和失败证据，不强制覆盖历史。浏览器 IndexedDB 会话不随静态部署自动迁移，修改会话结构时必须显式升级并保留旧数据恢复路径。
+
+## 0.4.0 起的原生核心同步
+
+更新检查同时比较 `vendor/spektralab/UPSTREAM.json` 里的 C++、常量和着色器参考 blob。保持 `core/` 原样，适配改动放在 `native/`；刷新原版中性滤色片与常量包时同步摘要。修改后用固定 Emscripten 4.0.23 重建，执行宿主/WASM 与浏览器 WGSL 对照，再按 NATIVE-MIGRATION.md 验证 RAW/导出；编译产物和源码必须来自同一版本。不得把数值探针结果作为完整 Metal 管线画质承诺。

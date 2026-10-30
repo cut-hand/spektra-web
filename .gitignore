@@ -1,3 +1,9 @@
 node_modules/
 .DS_Store
 test-output/
+
+vendor/spektralab/dist/*
+!vendor/spektralab/dist/README.md
+!vendor/spektralab/dist/BUILD.json
+vendor/spektralab/resources/spektrafilm_constants.bin
+vendor/spektralab/resources/profiles/

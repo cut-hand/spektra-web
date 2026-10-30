@@ -18,6 +18,15 @@ export function compareTree(baseline,tree){
  return changes;
 }
 
+export function compareNativeTree(manifest,tree){
+ const current=new Map(tree.filter(x=>x.type==='blob').map(x=>[x.path,x.sha]));
+ const expected={...(manifest.source_blobs||{}),...(manifest.reference_blobs||{})};
+ const changes=[];
+ for(const [path,sha] of Object.entries(expected)){const now=current.get(path);if(now!==sha)changes.push({path,status:now?'changed':'removed',baseline_sha:sha,current_sha:now||null});}
+ for(const [path,sha] of current)if(/^engine\/src\/core\/[^/]+\.(cpp|hpp)$/.test(path)&&!Object.hasOwn(expected,path))changes.push({path,status:'added',current_sha:sha});
+ return changes;
+}
+
 async function api(path){
  let last;
  for(let attempt=0;attempt<3;attempt++){
@@ -38,6 +47,8 @@ export async function checkUpstream(ref){
  const result=await api('git/trees/'+encodeURIComponent(commit.sha)+'?recursive=1');
  if(result.truncated||!Array.isArray(result.tree))throw Error('Incomplete upstream tree; refusing a partial comparison');
  const changes=compareTree(baseline,result.tree);
+ const nativeManifest=JSON.parse(await fs.readFile(new URL('../vendor/spektralab/UPSTREAM.json',import.meta.url),'utf8'));
+ const nativeChanges=compareNativeTree(nativeManifest,result.tree);
  return {
   checked_at:new Date().toISOString(),browser_version:baseline.browser_version,
   baseline_release:baseline.upstream_release,baseline_commit:baseline.upstream_commit,
@@ -45,8 +56,9 @@ export async function checkUpstream(ref){
   target_url:`https://github.com/${repository}/tree/${commit.sha}`,
   new_upstream_commit:commit.sha!==baseline.upstream_commit,
   material_or_notice_changes:changes,
+  native_core_or_kernel_changes:nativeChanges,
   native_changes_url:`https://github.com/${repository}/compare/${baseline.upstream_commit}...${commit.sha}`,
-  next_step:changes.length?'Review source, attribution and compatibility before importing; see UPDATING.md.':commit.sha!==baseline.upstream_commit?'Material/notice blobs unchanged. Review native code and release notes; do not assume engine parity.':'Pinned baseline is current for the selected ref.',
+  next_step:changes.length||nativeChanges.length?'Review source, attribution and compatibility before importing; see UPDATING.md.':commit.sha!==baseline.upstream_commit?'Material, notice and tracked native source blobs unchanged. Review native code and release notes; do not assume engine parity.':'Pinned baseline is current for the selected ref.',
   modified_local_files:false
  };
 }
