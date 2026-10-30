@@ -1,6 +1,8 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
-export function mountViewportInteraction({viewport,shell,canInteract,getZoom,setZoom,afterPan}){
+export function mountViewportInteraction({viewport,shell,canInteract,getZoom,setZoom,fitToWindow,afterPan}){
  let pan=null,suppressClick=false;
+ viewport.addEventListener('pointerdown',e=>{if(e.button!==1||!canInteract()||e.target.closest('button,input,select,textarea'))return;e.preventDefault();fitToWindow();afterPan();});
+ viewport.addEventListener('auxclick',e=>{if(e.button===1){e.preventDefault();}});
  viewport.addEventListener('wheel',e=>{
   if(!canInteract()||e.target.closest('button,input,select,textarea'))return;
   e.preventDefault();const before=shell.getBoundingClientRect();if(!before.width||!before.height)return;

@@ -27,6 +27,12 @@ export function compareNativeTree(manifest,tree){
  return changes;
 }
 
+export function compareVulkanTree(manifest,tree){
+ const expected=manifest.source_blobs||{},current=new Map(tree.filter(x=>x.type==='blob'&&/^engine\/src\/shaders\/vulkan\/[^/]+\.(comp|glsl)$/.test(x.path)).map(x=>[x.path,x.sha]));
+ const changes=[];for(const [path,sha]of Object.entries(expected)){const now=current.get(path);if(now!==sha)changes.push({path,status:now?'changed':'removed',baseline_sha:sha,current_sha:now||null});}
+ for(const [path,sha]of current)if(!Object.hasOwn(expected,path))changes.push({path,status:'added',current_sha:sha});return changes;
+}
+
 async function api(path){
  let last;
  for(let attempt=0;attempt<3;attempt++){
@@ -48,7 +54,8 @@ export async function checkUpstream(ref){
  if(result.truncated||!Array.isArray(result.tree))throw Error('Incomplete upstream tree; refusing a partial comparison');
  const changes=compareTree(baseline,result.tree);
  const nativeManifest=JSON.parse(await fs.readFile(new URL('../vendor/spektralab/UPSTREAM.json',import.meta.url),'utf8'));
- const nativeChanges=compareNativeTree(nativeManifest,result.tree);
+ const vulkanManifest=JSON.parse(await fs.readFile(new URL('../vendor/spektralab/vulkan/UPSTREAM.json',import.meta.url),'utf8'));
+ const nativeChanges=[...compareNativeTree(nativeManifest,result.tree),...compareVulkanTree(vulkanManifest,result.tree)];
  return {
   checked_at:new Date().toISOString(),browser_version:baseline.browser_version,
   baseline_release:baseline.upstream_release,baseline_commit:baseline.upstream_commit,

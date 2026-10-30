@@ -1,0 +1,16 @@
+{
+  "upstream_commit": "fd891c6bc5eb350387602deb5c1ef9b6dcdab948",
+  "emscripten": "4.0.23",
+  "asyncify": true,
+  "backend": "C++ pipeline + WebGPU compute",
+  "sources": {
+    "native/bridge.cpp": "db79c0d584dc494931d318595c8e3514ca8f93a98528afcc68e6e36dc95ea880",
+    "native/webgpu-backend.cpp": "80237519397ef6545ce6050edc6bc93ae28024406be140db167961337fefc8fe",
+    "native/webgpu-adapter.cpp": "bb7834289e7f57d6a73ac190cbb449649315cf86ae452776e290c80d1716ff15",
+    "gpu/shaders/manifest.json": "5f444dbcb45a9a70f5cf1c7f4dcfba0f024d408761af0da12c3e5a8e7a656c7f"
+  },
+  "files": {
+    "gpu-core.mjs": "265dcb8f9699761bf68e4a3c49adb29a78d6f42441bb048501c874a9a09fff3d",
+    "gpu-core.wasm": "da54a6ea76da4548a9dab27f8c4327d6aa87645100fb8d3d254226f9729cf5b0"
+  }
+}

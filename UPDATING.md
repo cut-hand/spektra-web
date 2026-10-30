@@ -34,3 +34,7 @@ Pages 使用 `main` 根目录，所有资源采用相对路径；需在实际 `/
 ## 0.4.0 起的原生核心同步
 
 更新检查同时比较 `vendor/spektralab/UPSTREAM.json` 里的 C++、常量和着色器参考 blob。保持 `core/`、`pipeline/`、`gpu/` 和 `shaders/` 原样，适配改动放在 `native/`；刷新原版中性滤色片与常量包时同步摘要。修改后用固定 Emscripten 4.0.23 重建，执行宿主/WASM 全图对照、原版 Metal 独立对照和泊松分布检验，再按 NATIVE-MIGRATION.md 验证 RAW/导出；编译产物和源码必须来自同一版本。不得把数值探针结果作为完整 Metal 管线画质承诺。
+
+## 0.6.0 WebGPU 同步
+
+检查器同时比较固定 Vulkan 原始着色器 blob。基线升级后核对 Vulkan/Metal 入口，重建 WGSL 和独立 GPU WASM，更新所有摘要。运行 tests/webgpu.html 的材料、空间、大图、颗粒与设备故障测试，复查后端切换与 RAW 各格式导出。不得静默用 CPU 冒充 GPU。

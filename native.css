@@ -64,3 +64,10 @@ dialog #jpegQuality::-moz-range-track{height:3px;background:#626262;border-radiu
 .preview-frame>.viewport{position:absolute;inset:0}
 .preview-hud{position:absolute;inset:0;z-index:8;pointer-events:none;overflow:hidden}
 .preview-hud .busy-overlay button{pointer-events:auto}
+
+/* Toolbar icons share one canvas, stroke and hit target. Keep the zoom percent pill. */
+.native-layout .native-toolbar .native-tool,.native-layout .native-toolbar .icon-button{width:28px;height:28px;min-width:28px;padding:5px;display:inline-flex;align-items:center;justify-content:center;flex:none;line-height:1;vertical-align:middle}
+.native-layout .native-toolbar svg{width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.native-layout .native-toolbar .about-native{display:none}
+
+.backend-selector{display:flex;align-items:center;gap:5px;margin-left:auto;margin-right:9px;font-size:10px;color:#aaa;font-weight:500}.backend-selector select{width:80px;height:21px;font-size:10px;padding:1px 19px 1px 8px}.backend-selector select:disabled{opacity:.5}

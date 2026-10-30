@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 import {cameraGains} from './effects.js';
 import {displayColour,canvasColour} from './display-colour.js';
-// All photographic computation runs in the C++ Worker. Canvas2D presents
-// tagged sRGB / Display P3 pixels; no WebGPU or WebGL context is requested.
+// The selected WASM or WebGPU Worker runs the photographic pipeline.
+// Canvas2D presents tagged sRGB / Display P3 output pixels.
 export class Renderer{
  constructor(request){this.request=request;this.gl=null;this.mode='C++ WASM';this.maxSize=8192;this.floatOutput=true;this.processed=null;this.nativeCalls=0;this.display=displayColour();}
  setLUT(lut){this.lut=lut;}

@@ -1,0 +1,1062 @@
+{
+  "upstream_commit": "fd891c6bc5eb350387602deb5c1ef9b6dcdab948",
+  "translator": "naga-cli 30.0.1",
+  "sources": {
+    "spk_rng.glsl": "204e63c1ebb7b325ecf06cdcd63d3e02e0ce05ea04ff8099dda6b7bf0c521a82",
+    "spk_affine3.comp": "7470b977401cf12ea8bca6d9f539b911a968035ec96286e562d461d846f22713",
+    "spk_boost.comp": "41cd7a7da4ebd41298a1de9263b162290f75d4ca3fb3aa997cab2506c4b327ae",
+    "spk_bw_correct.comp": "2a3a7f1aa8be4d9b993d55fc9c4d89d38fb9252590828650bf76b6fb416e548b",
+    "spk_cam16ucs_compress.comp": "1bdd96a0bd39b4d56fb13729b0c584bb7325ace746909b58bcbbfdd28c25f941",
+    "spk_cctf_decode.comp": "716ab1c4c9ca9e87066884716d139e00a48a9cf396853fe3611359fb3f971966",
+    "spk_cctf_encode_matrix.comp": "b60dbaafbfb0c19d4474ffdc65764d352948494901c47a96c60e75f73913ea27",
+    "spk_couplers_correction.comp": "e64909ba705d09ab2c4732c82df080851b8dd663749088aa8681acf4a42f9c25",
+    "spk_curves.comp": "bcff6181dd9aa56a6c04b7b1bf8c0a7435f88813163bd2fe42018d11ab3738bf",
+    "spk_di_normalise.comp": "060b3ad17fa3d4131819ee8aa08a6c1aa60f362b0e13433335f9ae8578ecca35",
+    "spk_edr.comp": "2454498a651b8ce1ebeb9086f8517371ed903ae5cb219fc9869cad9958eaa820",
+    "spk_geometry_resample_df.comp": "54a9c84a908a9fce597949d39977f9e7bfa880b0700ea455fb8f81f065348831",
+    "spk_glare_add.comp": "723b4db22b7f6f55e89ca9dd8cea0bac73ddbba4a6fea87cfd887c3931591ef4",
+    "spk_grain_layer_one.comp": "9b7b58d71228c3dc519ddbf158268c35b6a292dd15e80262556e6fd48e6ef89e",
+    "spk_grain_layers.comp": "9699ecd0ae5892cc4b6eb83793ab716a21d69860d88d378e481237a4cf9d2392",
+    "spk_grain_simple.comp": "3d9c986dbe260e2f8bbe7dfb76474ad9eb36f9ab13cbe28c995b8e239350f285",
+    "spk_iir_df_acc.comp": "6f313e6dd31e6332a9bdb45e2fa8bbc6c134fbc1ccc3b264774b0a7111d97e95",
+    "spk_lincomb3.comp": "0ad7da930f8597ad762646ba0bee7e1eb5563ded8850daf140455ea2553d8681",
+    "spk_log10_guarded.comp": "69d11a9d5faef02c8e3e683568e84b5f2e21754a3acc4856f5bf236d89aee16f",
+    "spk_lognormal_field.comp": "ce8780b7818dff501f738959af012f94c568595f7116944b58b8fa3b130ca137",
+    "spk_lut2d_cubic.comp": "b8c7226a20e403dd4ea9317be2ffb85d6cbdc9acc3eff63e9d0d250f9efbe40d",
+    "spk_lut3d_trilinear.comp": "59bb59de4d5109ce01bbf0218984d2c088c4bf13169773bd6815665d6612e8a6",
+    "spk_math_probe.comp": "c72e4a5ae2907eeca515b3b09540b6351a54bc88a1ccc03650c873da295191c8",
+    "spk_matmul3.comp": "9e2c7183157c9a87b7934aa9b214af15f78077c56f0b2b87a2f56c3684c92bbe",
+    "spk_mul.comp": "5326f9f5a3195ec5e38cb1def84b1453141032c02da7ef13db19925ace9dedc5",
+    "spk_print_exposure.comp": "1ee17450d2f2038c8bb2d64dd298cc3bf455773912bd6ea89a6932b979682eb7",
+    "spk_reduce_max.comp": "169656745e3aefe0309e7cc3fe446689756622f7f6063339ef5f151ae9199a6c",
+    "spk_rng_probe.comp": "f5497ed15b6324a8de38599cd2cd2bca087ef68468ccb6f71df1dd865a19c983",
+    "spk_sep_fir_acc.comp": "bf40caa52dfff49e59365055327211cdd55198211eeb38e84a79c69ac7333609",
+    "spk_spectral_epilogue.comp": "8185466f9e0859937c345bb38e0f5bb65708529f49dbdde0a5ed2ed62ff16053",
+    "spk_stride_sample.comp": "f4b80aaa43879d8a87520f33fbae67b37f233eee5b575255dc543e4941fccc81",
+    "spk_take_rgb.comp": "73660646f9c231a7253ad247123eb8040bcc725e591d477b25254528b40a7709",
+    "spk_tc_b.comp": "ce3facfdc7abf15eec4310cc149f8441b9481b95a26c8f00b4f16646f93fd8b6",
+    "spk_to_rgba16.comp": "b7b59b3f262ce29e85a7ff973fdb84d86767f0e3c6e2c13279694145d5b199c4",
+    "spk_zoom_bilinear_mirror.comp": "27f7f57d74027a662bca79e283e74caaa7eb147703eea96f10d1cbfe2a0df528",
+    "spk_di_encode.comp": "7ac9b4a39762f7e8946c0f3e200e94d68c0cab9b2e27e947f9bc6a3c113018d6",
+    "spk_highlight_headroom.comp": "d69ba1a0e8cce2c5ee4847e9cdb131a3c833638aee7a20c2d96ffc8fa6a14a86",
+    "spk_scene_latitude.comp": "2540057ea385b73bf5c83c208b9d9a0f603e423dbfdbb888871c1f642a299204",
+    "spk_mask_reduce.comp": "5c47f9fa938a8a3efc63780f5430f312b41cc28f461b751adc62191cebe0d67f",
+    "spk_mask_epilogue.comp": "feac8fc336ebf2082f4a228a7ac65f94ecf3eddf7289c5964cf2e5369054d798"
+  },
+  "kernels": {
+    "spk_affine3": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read"
+        },
+        {
+          "binding": 4,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "920facbc0c8ebb34f81906aec10fab556b228ff7e24a1c5729b2cba29a9e29aa"
+    },
+    "spk_boost": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "c28486a2e84f7fc92675087e6859fa83dc0a0929f5ce23eb42adaa39bb3ee0ec"
+    },
+    "spk_bw_correct": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "37e311540064fc1efc2cfb841589ecd693c9dd672809a3ff28c63e87689e5f6d"
+    },
+    "spk_cam16ucs_compress": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read"
+        },
+        {
+          "binding": 4,
+          "access": "read"
+        },
+        {
+          "binding": 5,
+          "access": "read"
+        },
+        {
+          "binding": 6,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "d59f5f0324b2976444359f829aaa5098a5b097a7000d2cc4f5a61358086bfb84"
+    },
+    "spk_cctf_decode": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "88b258e6f862924524fdf60f20e19e138a751c11545a70e0750f5f51d0fd398e"
+    },
+    "spk_cctf_encode_matrix": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "df080b0393ddbc08b38c6fcefc5717d23acfd1373118c27b4413c701d52ce80d"
+    },
+    "spk_couplers_correction": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read"
+        },
+        {
+          "binding": 4,
+          "access": "read"
+        },
+        {
+          "binding": 5,
+          "access": "read"
+        },
+        {
+          "binding": 6,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "11f721761a8d76e44d79a2a056da36d8dc3a94569b2e3a0b486d8fa54d49c133"
+    },
+    "spk_curves": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read"
+        },
+        {
+          "binding": 4,
+          "access": "read"
+        },
+        {
+          "binding": 5,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "56d9121a56d5306c265cdca28257bd4cd4427a57ce8973ec41582fab7eadc72f"
+    },
+    "spk_di_normalise": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read"
+        },
+        {
+          "binding": 4,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "1318d0b420e1f1bbab1e8e0a89a64c5356742cbf76885bd6209b285c8749cfde"
+    },
+    "spk_edr": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read"
+        },
+        {
+          "binding": 4,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "8391d84306b78fd5c315932de65a01a0c49978d5bd329a421746587a88098c35"
+    },
+    "spk_geometry_resample_df": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "af6422f0ddd576ccdc21f20799a5259bb139ef30c9eded32f3f27841c5395150"
+    },
+    "spk_glare_add": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read"
+        },
+        {
+          "binding": 4,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "4b5196a6cb85071915233f8978933fd4f80c8411c788cb9184a424ec40e87853"
+    },
+    "spk_grain_layer_one": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read"
+        },
+        {
+          "binding": 4,
+          "access": "read"
+        },
+        {
+          "binding": 5,
+          "access": "read"
+        },
+        {
+          "binding": 6,
+          "access": "read"
+        },
+        {
+          "binding": 7,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "ab0ef0b91295ab49946becb3dc7616df32df697e6c974edac296d2be3fb4e4c7"
+    },
+    "spk_grain_layers": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read"
+        },
+        {
+          "binding": 4,
+          "access": "read"
+        },
+        {
+          "binding": 5,
+          "access": "read"
+        },
+        {
+          "binding": 6,
+          "access": "read"
+        },
+        {
+          "binding": 7,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "493f3ca0ce463b7ce50c6c5f7f5c6a599496f0731e8f191f52f39dfa17007eb2"
+    },
+    "spk_grain_simple": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read"
+        },
+        {
+          "binding": 4,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "bebe7c8ba4b39b7ca8698586e25731a6af8147ee48e3dfb226a6176cfaf18b9b"
+    },
+    "spk_iir_df_acc": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read"
+        },
+        {
+          "binding": 4,
+          "access": "read"
+        },
+        {
+          "binding": 5,
+          "access": "read"
+        },
+        {
+          "binding": 6,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "79b7c021fd9b2e4a631e7d9049ee40fc9d10282157a315b372b77ddd2c3abaf3"
+    },
+    "spk_lincomb3": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read"
+        },
+        {
+          "binding": 4,
+          "access": "read"
+        },
+        {
+          "binding": 5,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "c1f754ae5d748a38901f4d4491c283a28639a8549da8f15619c8dbb3033314ca"
+    },
+    "spk_log10_guarded": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "a788728f642c8c4f871da8256879bbdd7dba1b765908e3195491d36e84941333"
+    },
+    "spk_lognormal_field": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "3d52b151c7530a84757bdbee9bd027fb29af1405d54ed73e2873f8978a6fa772"
+    },
+    "spk_lut2d_cubic": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read"
+        },
+        {
+          "binding": 4,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "36630ba2105a4ea9efc887e37e2172a705c6dcb428db8f3011e38d2f1598dd41"
+    },
+    "spk_lut3d_trilinear": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read"
+        },
+        {
+          "binding": 4,
+          "access": "read"
+        },
+        {
+          "binding": 5,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "893a3c285f2351557f87065ae58a5b1deb6b306d8c585a0a7e9cdd2cca911ca8"
+    },
+    "spk_math_probe": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "f2fab53d9bbe9c0b09c1982a1e203eb1e40dc463473f82743278740583eb5002"
+    },
+    "spk_matmul3": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "6d70400b7719d8e3fc5fef3a7f989dc2d7ce67256db3d3e79f22ae8d26050fa1"
+    },
+    "spk_mul": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "162a71c9f9f1d5c2531f5e0c20e183289c29f75c81f800915634270812e62405"
+    },
+    "spk_print_exposure": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "9cee3eee883591d80f6a83efc8547101a0cf76d69958972b992756fa3026d849"
+    },
+    "spk_reduce_max": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "d48cf859fbbf1a3de23798c6d3c98e071942b2b18f495e8c6b7884a2a73dd1d3"
+    },
+    "spk_rng_probe": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "3e7bf5c602caf9b00ce4cb415df7e56bbcfd13ae2a32e41d5dc156833ca4d5ea"
+    },
+    "spk_sep_fir_acc": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read"
+        },
+        {
+          "binding": 4,
+          "access": "read"
+        },
+        {
+          "binding": 5,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "0027eb91657827dc2def54d9060ff7ff6af6dcba26f18d1f35ea9f9a8b6dcc05"
+    },
+    "spk_spectral_epilogue": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read"
+        },
+        {
+          "binding": 4,
+          "access": "read"
+        },
+        {
+          "binding": 5,
+          "access": "read"
+        },
+        {
+          "binding": 6,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "e0544f807dbb0a7480f7c196b52d2ed50cb3499874bc03b85447d461e89f0ac4"
+    },
+    "spk_stride_sample": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "5990c9a31de10afb97cc0054cfb6086f58c168f9202501a7ffa7b9e1f7f79876"
+    },
+    "spk_take_rgb": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "db1d63f94fc2dd408786b8fb05875007ef21755122211603cc3e292321bf0d57"
+    },
+    "spk_tc_b": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read_write"
+        },
+        {
+          "binding": 4,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "44d6f8dd4d2c888881e243e11260651967bf77b0cda2dd0adba8b9762df17761"
+    },
+    "spk_to_rgba16": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "e7669aea2ca87f68dca1d4ed48af03b1e028c0210d990c548c22f46cca33f5c8"
+    },
+    "spk_zoom_bilinear_mirror": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "2bc21cda10c8412634d09bd9f7061f9557d71098455d334fc9b693d7db631640"
+    },
+    "spk_di_encode": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "607f1eb558f9158722ee9e9b2fa9903cae5191a608e7a3c7d75ecb6244cb7e4e"
+    },
+    "spk_highlight_headroom": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "18cfd7cf8cab93475d8ddbd1a9c5d1843abec68d2fa26d9d1560b5e6cf3fbbbe"
+    },
+    "spk_scene_latitude": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "306b54f4fc8c96fe0a84d1525ae2ad594316121c341c56bf2255c037f36cdbff"
+    },
+    "spk_mask_reduce": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read"
+        },
+        {
+          "binding": 4,
+          "access": "read"
+        },
+        {
+          "binding": 5,
+          "access": "read"
+        },
+        {
+          "binding": 6,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "efb6ac4b8c48a802ff29f4f34a7ab4647f0074af84cf3ff82598adb4e6d83387"
+    },
+    "spk_mask_epilogue": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read"
+        },
+        {
+          "binding": 4,
+          "access": "read"
+        },
+        {
+          "binding": 5,
+          "access": "read"
+        },
+        {
+          "binding": 6,
+          "access": "read"
+        },
+        {
+          "binding": 7,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "8be7008349c1748f8726f95ab489ed420e32057fbc24f4bd549475962bd11292"
+    },
+    "spk_web_encode": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "fb71ef65729615f35fd6a2da35811d49c347396c037c9f1494bd093b927165e2"
+    },
+    "spk_web_grade": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "25563c515a08571ec9dc7529c506fe10c64d1f9bd829f2a198f6c3936d78534f"
+    },
+    "spk_web_input": {
+      "bindings": [
+        {
+          "binding": 0,
+          "access": "read"
+        },
+        {
+          "binding": 1,
+          "access": "read"
+        },
+        {
+          "binding": 2,
+          "access": "read"
+        },
+        {
+          "binding": 3,
+          "access": "read_write"
+        }
+      ],
+      "sha256": "98a8b934fea076cfcad9c3b0526339a27769887b3a10ed58f0730e5949ab974a"
+    }
+  }
+}

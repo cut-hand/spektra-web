@@ -1,7 +1,7 @@
 {
   "upstream_commit": "fd891c6bc5eb350387602deb5c1ef9b6dcdab948",
   "emscripten": "4.0.23",
-  "adapter_sha256": "d84683b0ad6f4dc4fff5f24259b3bf4775358a8454a29d8311ce7c0eb8ba7e62",
+  "adapter_sha256": "db79c0d584dc494931d318595c8e3514ca8f93a98528afcc68e6e36dc95ea880",
   "backend": "C++ CPU / WASM (no graphics API)",
   "kernel_adapter_sha256": "c5fddba47f08a6c5201af9b043db09b958e080df9851a5294f6b8fcdda70d3b9",
   "generator_sha256": "36f237ef6531d908e599a94c0620d71c34ea3695a06c095a26614a888aac7ad1",

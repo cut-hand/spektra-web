@@ -1,0 +1,6 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+import {createWebGPUCore} from './core.js';
+import {materialOptions} from '../material-options.js';
+let loading;const get=()=>loading??=createWebGPUCore();
+let queue=Promise.resolve();self.onmessage=event=>{queue=queue.then(async()=>{const m=event.data;try{const core=await get();if(m.type==='init'){postMessage({id:m.id,ready:true,engine:'WebGPU',kernels:core.runtime.kernels.size,limits:{binding:core.runtime.device.limits.maxStorageBufferBindingSize}});return;}if(m.type!=='frame')throw Error('Unsupported WebGPU request');await core.prepare(m.params.film,m.params.paper,materialOptions(m.params));const input=new Float32Array(m.pixels);if(m.overlay?.indices?.length){const values=core.convert(m.overlay.pixels,'sRGB',m.params.sourceColorSpace,true);for(let j=0;j<m.overlay.indices.length;j++)for(let c=0;c<3;c++){let v=values[j*3+c];if(m.params.sourceEncoded===false)v=m.params.sourceColorSpace==='ProPhoto RGB'?(v<.03125?v/16:v**1.8):(v<=.04045?v/12.92:((v+.055)/1.055)**2.4);input[m.overlay.indices[j]*3+c]=v;}}
+const out=await core.frame(input,m.width,m.height,m.params);postMessage({id:m.id,pixels:out.data.buffer,meterEV:out.meterEV,stats:out.stats,engine:'WebGPU'},[out.data.buffer]);}catch(e){postMessage({id:m.id,error:e.message||String(e)});}});};

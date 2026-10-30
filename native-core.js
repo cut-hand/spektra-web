@@ -3,8 +3,8 @@ import createCore from './vendor/spektralab/dist/core.mjs';
 export const nativeCoreVersion='SpektraLab 1.3.4 / C++ WASM full frame / ProPhoto RGB';
 export class NativeCore {
  constructor(module){this.module=module;this.root='/resources';this.key=null;}
- static async load({wasmBinary,readResource,readProfile}={}){
-  const m=await createCore(wasmBinary?{wasmBinary}:{});
+ static async load({wasmBinary,readResource,readProfile,moduleFactory=createCore}={}){
+  const m=await moduleFactory(wasmBinary?{wasmBinary}:{});
   const bytes=readResource|| (async name=>{const r=await fetch(new URL('./vendor/spektralab/'+(name.endsWith('.bin')?'dist/':'resources/')+name,import.meta.url));if(!r.ok)throw Error('原生核心资源加载失败：'+name);return new Uint8Array(await r.arrayBuffer());});
   m.FS.mkdir('/resources');m.FS.mkdir('/resources/profiles');
   m.FS.writeFile('/resources/spektrafilm_constants.bin',await bytes('spektrafilm_constants.bin'));

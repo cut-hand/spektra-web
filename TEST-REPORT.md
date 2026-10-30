@@ -121,3 +121,9 @@ LUT 插值与本实现直接模型的采样差：平均 0.00105、最大 0.03262
 
 - 0.3.1 再测 RAW 导入和关闭颗粒后的 TIFF16 导出；独立读取为 2048×1366、三通道各 16 位、ICC 588 字节。CineStill 无防光晕层状态及菜单吸管验证通过。
 
+
+## 0.6.0 — 2026-10-31
+
+54 real WebGPU/WASM small-frame cases and 3 large cases pass; five-density Poisson moments, seed repeatability, actual GPU-device loss detection and transferred-input WASM retry pass. IMG08651.ARW GPU preview and 3514x2344 JPEG/PNG/TIFF16 downloads verified; JPEG ICC588, ProPhoto TIFF ICC596 and RGB16 tags. Performance and numerical limits: NATIVE-MIGRATION.md. Private test photos/exports remain ignored.
+
+GPU批量ZIP实际下载通过，内含两张可读取JPEG；真实RAW TIFF16有51583种通道值（非8位扩展）。实际WASM↔WebGPU切换、WebGPU初始化、单格标签与中键100%→适配窗口验证通过，所有工具栏图标目标28×28、SVG18×18。标准52项测试51通过，1项可选Metal测试跳过。

@@ -22,6 +22,9 @@
 #include "pipeline.hpp"
 #include "cpu-backend.hpp"
 #include "output-transform.hpp"
+#ifdef SPK_WEBGPU
+#include "webgpu-adapter.hpp"
+#endif
 using namespace spk;
 namespace {
 std::string error;
@@ -192,7 +195,11 @@ bool frame(const float*input,float*output,uint32_t w,uint32_t h,const Json&o){
  p.scanner.unsharp_mask[1]=value(o,"sharpen",0)/100.;
  const double pg=value(o,"paperGamma",1);if(pg!=1){p.print_render.density_curves_morph.active=true;p.print_render.density_curves_morph.gamma_factor=pg;}
  Mat3 convert;std::vector<float> scanPixels;Image uncachedScan;
- const size_t elements=size_t(w)*h*3;const bool memoAllowed=size_t(w)*h<=1000000&&!o.at("disableFrameCache").as_bool(false);const auto memoKey=nativeFrameKey(o);
+ const size_t elements=size_t(w)*h*3;const bool memoAllowed=
+#ifdef SPK_WEBGPU
+false&&
+#endif
+size_t(w)*h<=1000000&&!o.at("disableFrameCache").as_bool(false);const auto memoKey=nativeFrameKey(o);
  lastFrameCacheHit=memoAllowed&&frameMemo.generation==modelGeneration&&frameMemo.w==w&&frameMemo.h==h&&frameMemo.key==memoKey&&frameMemo.input.size()==elements&&std::memcmp(frameMemo.input.data(),input,elements*sizeof(float))==0;
  if(!lastFrameCacheHit){
  Pipeline pipe(cpu.get(),&colour,&blob,&cache);if(!pipe.build(p,error))return false;
@@ -202,9 +209,15 @@ bool frame(const float*input,float*output,uint32_t w,uint32_t h,const Json&o){
  // Do not add a working-to-working transform at this adapter boundary.
  if(src!="ProPhoto RGB"&&!colour.matrix_RGB_to_RGB(src,"ProPhoto RGB","CAT02",convert,error))return false;
  Image in;in.w=w;in.h=h;in.c=3;in.buf=cpu->alloc(in.bytes(),error);if(!in.buf)return false;
+#ifndef SPK_WEBGPU
  auto*linear=static_cast<float*>(cpu->contents(in.buf.get()));
+#endif
  const Json& gain=o.at("cameraGains");double gains[3]={1,1,1};if(gain.is_array()&&gain.items().size()==3)for(int c=0;c<3;c++)gains[c]=gain.items()[c].as_double(1);
+#ifdef SPK_WEBGPU
+ if(!webgpu_input(cpu.get(),input,in,convert,gains,encoded,cctf_mode_for(src),error))return false;
+#else
  for(size_t i=0;i<size_t(w)*h;i++){double a[3],b[3];for(int c=0;c<3;c++){const auto v=input[i*3+c];if(!std::isfinite(v)){error="Non-finite source pixel";return false;}a[c]=encoded?colour.cctf_decode(v,src):v;}convert.apply(a,b);for(int c=0;c<3;c++)linear[i*3+c]=float(b[c]*gains[c]);}
+#endif
  pipe.set_source_long_edge(uint32_t(value(o,"sourceLongEdge",std::max(w,h))),uint32_t(value(o,"frameLongEdge",std::max(w,h))));
  if(p.camera.auto_exposure){double ev;if(!pipe.measure_exposure_ev(in,ev,error,true))return false;pipe.set_auto_exposure_ev(ev);lastMeter=ev;}else lastMeter=0;
  Image negative,scan;if(!pipe.run_film(in,negative,nullptr,error)||!pipe.run_print(negative,scan,nullptr,error))return false;
@@ -213,6 +226,9 @@ bool frame(const float*input,float*output,uint32_t w,uint32_t h,const Json&o){
   if(memoAllowed){frameMemo.generation=modelGeneration;frameMemo.w=w;frameMemo.h=h;frameMemo.key=memoKey;frameMemo.input.assign(input,input+elements);frameMemo.scan=std::move(scanPixels);frameMemo.meter=lastMeter;}
   else frameMemo=FrameMemo{};
  }else lastMeter=frameMemo.meter;
+#ifdef SPK_WEBGPU
+ return webgpu_output(cpu.get(),uncachedScan,output,o,colour,cache,model->isDI,error);
+#else
  const float*rgb=memoAllowed?frameMemo.scan.data():static_cast<const float*>(cpu->contents(uncachedScan.buf.get()));
  const auto dst=o.at("targetColorSpace").is_string()?o.at("targetColorSpace").as_string():"sRGB";
  convert=Mat3::identity();
@@ -240,6 +256,7 @@ bool frame(const float*input,float*output,uint32_t w,uint32_t h,const Json&o){
  }
  if(kernelOutput)encode_display(output,w,h,transform.cam,transform.p.io.output_gamut_compress,cctf_mode_for(dst),grade.vignette);
  return true;
+#endif
 }
 
 }
