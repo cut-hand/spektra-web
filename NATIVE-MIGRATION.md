@@ -1,4 +1,4 @@
-# 原版 C++ / WASM 管线：0.5.2
+# 原版 C++ / WASM 管线：0.5.3
 
 基线为 SpektraLab 1.3.4，固定提交 `fd891c6bc5eb350387602deb5c1ef9b6dcdab948`。保持现有原版布局，照片不离开浏览器。按用户要求移除了 WebGPU 和 WebGL 计算路径。
 
@@ -62,3 +62,11 @@ SPK_ORACLE_METALLIB=/path/to/SpektraLab.app/Contents/Resources/Resources/engine/
 ## 0.5.2 预览呈现
 
 摄影核心和编译产物不变。快速预览后，独立、可终止的CPU Worker计算匹配窗口DPR的细节；任务完成后释放Worker及WASM堆，保留完成图像用于原图/分割对比。切换照片、摄影参数或导出会取消过时任务。缩放独立于快照分辨率。当前6MP/4096px预览上限与RAW半尺寸解码边界在界面说明，导出仍按原配置执行。
+
+## 0.5.3 RAW/画布边界纠正
+
+libraw-wasm 1.6.0的applySettings仅接受六项gamm。先前传[1,1]被忽略，文档中所谓线性RAW并未得到运行验证，本轮已纠正为[1,1,0,0,0,0]，noAutoBright:true，adjustMaximumThr:0，bright:1，保留相机WB。用自生成两档4:1拜耳DNG直接运行所发WASM，旧比值2.40759，修复4.00076；不依赖私有照片。
+
+原版Canvas在工作空间后交给ColorSync，文件导出另做CAM16。新增displayOutput契约只做目标矩阵/TRC；P3画布/图像数据/分割与片边/最终画布都保留一致标记。JPEG/PNG保持sRGB和原生导出映射，TIFF保持ProPhoto。跳过适配层冗余ProPhoto到自身变换，未修改上游矩阵、曲线或材料。
+
+实际IMG08651.ARW与原版同设置CIRAWFilter参考对照确认，Apple相机配置与LibRaw泛用矩阵仍有差异；此诊断只在本机运行，不被产品依赖。没有宣称浏览器能运行Apple专有RAW引擎。

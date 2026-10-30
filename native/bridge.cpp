@@ -151,7 +151,7 @@ std::unique_ptr<gpu::Gpu> cpu;
 double lastMeter=0;uint64_t modelGeneration=0;bool lastFrameCacheHit=false;
 struct FrameMemo {uint64_t generation=0;uint32_t w=0,h=0;std::string key;std::vector<float> input,scan;double meter=0;};
 FrameMemo frameMemo;
-const std::set<std::string> outputKeys={"exposure","temperature","postTint","contrast","saturation","curveShadows","curveMid","curveHighlights","balanceR","balanceG","balanceB","shadowR","shadowG","shadowB","highlightR","highlightG","highlightB","vignette","targetColorSpace","compare","split","disableFrameCache","referenceOutputTransform"};
+const std::set<std::string> outputKeys={"exposure","temperature","postTint","contrast","saturation","curveShadows","curveMid","curveHighlights","balanceR","balanceG","balanceB","shadowR","shadowG","shadowB","highlightR","highlightG","highlightB","vignette","targetColorSpace","displayOutput","compare","split","disableFrameCache","referenceOutputTransform"};
 std::string nativeFrameKey(const Json&o){Json k=Json::object();for(const auto&[name,v]:o.fields())if(!outputKeys.count(name))k.set(name,v);return k.dump();}
 struct Grade {
  double gain[3],contrast,saturation,curve[3],balance[3],shadow[3],highlight[3],vignette;bool encoded=false,curves=false;
@@ -198,7 +198,9 @@ bool frame(const float*input,float*output,uint32_t w,uint32_t h,const Json&o){
  Pipeline pipe(cpu.get(),&colour,&blob,&cache);if(!pipe.build(p,error))return false;
  const auto src=o.at("sourceColorSpace").is_string()?o.at("sourceColorSpace").as_string():"sRGB";
  const bool encoded=o.at("sourceEncoded").as_bool(true);
- if(!colour.matrix_RGB_to_RGB(src,"ProPhoto RGB","CAT02",convert,error))return false;
+ // The native app hands already-ProPhoto pixels straight to the engine.
+ // Do not add a working-to-working transform at this adapter boundary.
+ if(src!="ProPhoto RGB"&&!colour.matrix_RGB_to_RGB(src,"ProPhoto RGB","CAT02",convert,error))return false;
  Image in;in.w=w;in.h=h;in.c=3;in.buf=cpu->alloc(in.bytes(),error);if(!in.buf)return false;
  auto*linear=static_cast<float*>(cpu->contents(in.buf.get()));
  const Json& gain=o.at("cameraGains");double gains[3]={1,1,1};if(gain.is_array()&&gain.items().size()==3)for(int c=0;c<3;c++)gains[c]=gain.items()[c].as_double(1);
@@ -213,11 +215,12 @@ bool frame(const float*input,float*output,uint32_t w,uint32_t h,const Json&o){
  }else lastMeter=frameMemo.meter;
  const float*rgb=memoAllowed?frameMemo.scan.data():static_cast<const float*>(cpu->contents(uncachedScan.buf.get()));
  const auto dst=o.at("targetColorSpace").is_string()?o.at("targetColorSpace").as_string():"sRGB";
- if(!colour.matrix_RGB_to_RGB("ProPhoto RGB",dst,"CAT02",convert,error))return false;
- // The app's output transform occurs once, after the completed ProPhoto
- // scan. Same CAT02/CAM16/CCTF contract as spk_output_transform upstream.
+ convert=Mat3::identity();
+ if(dst!="ProPhoto RGB"&&!colour.matrix_RGB_to_RGB("ProPhoto RGB",dst,"CAT02",convert,error))return false;
+ // The native canvas uses display colour management (matrix/TRC). The
+ // export destination additionally receives the native CAM16 gamut mapping.
  Model transform;transform.p.io.output_gamut_compress=GamutCompressSpec::output_default();const Cam16Setup* cm=nullptr;
- if(dst!="ProPhoto RGB"&&!cache.cam16(colour,dst,cm,error))return false;if(cm)transform.cam=*cm;
+ if(dst!="ProPhoto RGB"&&!o.at("displayOutput").as_bool(false)&&!cache.cam16(colour,dst,cm,error))return false;if(cm)transform.cam=*cm;
  const Grade grade(o);const bool kernelOutput=cm&&!model->isDI&&!o.at("referenceOutputTransform").as_bool(false);
  for(size_t i=0;i<size_t(w)*h;i++){
   double lin[3],dest[3];if(model->isDI){for(int c=0;c<3;c++)output[i*3+c]=rgb[i*3+c];continue;}

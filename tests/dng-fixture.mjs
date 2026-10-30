@@ -1,0 +1,9 @@
+// Synthetic, non-photographic Bayer DNG: two linear neutral patches, 4:1.
+export function makeDNG(){
+ const w=256,h=128,tags=[],size={1:1,2:1,3:2,4:4,5:8,10:8};
+ function tag(id,type,values){if(type===2)values=Buffer.from(values+'\0');const count=type===2?values.length:values.length,b=Buffer.alloc(count*size[type]);if(type===2)values.copy(b);else values.forEach((v,i)=>{if(type===1)b[i]=v;else if(type===3)b.writeUInt16LE(v,i*2);else if(type===4)b.writeUInt32LE(v,i*4);else{const a=Array.isArray(v)?v:[v,1];type===10?b.writeInt32LE(a[0],i*8):b.writeUInt32LE(a[0],i*8);b.writeUInt32LE(a[1],i*8+4);}});tags.push({id,type,count,b});}
+ tag(256,4,[w]);tag(257,4,[h]);tag(258,3,[16]);tag(259,3,[1]);tag(262,3,[32803]);tag(271,2,'Spektra Test');tag(272,2,'Linear Fixture');tag(273,4,[0]);tag(277,3,[1]);tag(278,4,[h]);tag(279,4,[w*h*2]);tag(284,3,[1]);tag(33421,3,[2,2]);tag(33422,1,[0,1,1,2]);tag(50706,1,[1,4,0,0]);tag(50707,1,[1,1,0,0]);tag(50708,2,'Spektra Linear Fixture');tag(50710,1,[0,1,2]);tag(50711,3,[1]);tag(50713,3,[1,1]);tag(50714,5,[0]);tag(50717,4,[65535]);tag(50718,5,[1,1]);tag(50719,4,[0,0]);tag(50720,4,[w,h]);tag(50721,10,[1,0,0,0,1,0,0,0,1]);tag(50728,5,[1,1,1]);tag(50778,3,[21]);
+ tags.sort((a,b)=>a.id-b.id);let end=8+2+tags.length*12+4;for(const t of tags)if(t.b.length>4){end=(end+3)&~3;t.offset=end;end+=t.b.length;}end=(end+3)&~3;tags.find(t=>t.id===273).b.writeUInt32LE(end);const out=Buffer.alloc(end+w*h*2);out.write('II');out.writeUInt16LE(42,2);out.writeUInt32LE(8,4);out.writeUInt16LE(tags.length,8);
+ tags.forEach((t,i)=>{const at=10+i*12;out.writeUInt16LE(t.id,at);out.writeUInt16LE(t.type,at+2);out.writeUInt32LE(t.count,at+4);if(t.offset){out.writeUInt32LE(t.offset,at+8);t.b.copy(out,t.offset);}else t.b.copy(out,at+8);});
+ for(let y=0;y<h;y++)for(let x=0;x<w;x++)out.writeUInt16LE(Math.round((x<w/2?.04:.16)*65535),end+(y*w+x)*2);return new Uint8Array(out);
+}

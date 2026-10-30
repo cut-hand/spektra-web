@@ -37,3 +37,5 @@ dialog{background:#303030;border-color:#555;border-radius:9px;color:#ddd}dialog 
 /* Keep only photographs in the native bottom strip; management lives in More tools. */
 .native-layout .filmstrip{display:flex;align-items:center;grid-template-rows:none}.native-layout .filmstrip-title{display:none}.native-layout .thumbnails{width:100%;height:100%}.native-layout .thumbnail{width:150px;height:103px}.native-layout .library-actions{display:flex;margin:7px 0 12px;flex-wrap:wrap}.native-layout #libraryCount{font-size:10px;color:#aaa}
 @media(max-width:720px){.native-layout .thumbnail{width:100px;height:68px}}
+
+.photo-shell:not(.picking){cursor:grab;touch-action:none}.photo-shell.is-panning:not(.picking){cursor:grabbing;user-select:none}
