@@ -194,3 +194,12 @@
 - 同轮用户新增：分割按钮再次点击关闭，预览鼠标滚轮以指针为中心缩放、左键拖动平移；已接入，待真实浏览器测试。
 
 - 检查点d029876已保存。48测试47通过/1可选跳过；实际WASM 4:1 DNG线性门禁通过，显示/文件转换分离对照通过；真实浏览器分割开关、滚轮和拖动通过。IMG08651.ARW新的TIFF2048×1366 / RGB16 / ProPhoto ICC596独立验证。准备0.5.3发布，不声称Apple/LibRaw完整一致。
+
+## 0.5.4 — rail cleanup, export and visible refinement (2026-10-30)
+- No rail ellipsis menus. Print immediately follows film. Enlarger illuminant/note, pointer/crop toolbar tools, photo management/pairing, recipe I/O, IndexedDB session UI/writes and clipping warning removed. Existing stored data not deleted. Core import/thumbnail selection/clipboard sync retained.
+- Circular SVG reset and quarter-turn icons; geometry edits fit/center preview, custom aspect included in source cache key. Asymmetric high-bit quarter-turn regression verifies all directions and round trip.
+- Export select padding/height clipping fixed; generated files keep a real download link, errors remain in modal. JPEG quality track follows value and exposes percentage, hidden for other types.
+- Reproduced default 3514x2344 RAW export failure under 1 GiB. Best-fit CPU pool, obsolete idle buffer trimming, shared input/output frame allocation; on-demand ceiling 2 GiB. No core photographic formula/profile changes. Default RAW JPEG actual download: 3514x2344, 588-byte sRGB ICC; TIFF actual download: same dimensions, RGB16, 596-byte ProPhoto ICC, 47.1 MiB. Test files remain ignored/local.
+- 49 tests: 48 pass, 1 optional Metal skipped. Existing C++/WASM comparisons pass with in-place ABI.
+- Obvious refining badge (spinner + text), clears on completion/cancel/error, does not intercept pan/zoom.
+- User now permits optional WebGPU, but explicitly chose to show selector ONLY after complete GPU pipeline/parity validation. Full WebGPU not implemented in this release, no partial option.

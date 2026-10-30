@@ -14,8 +14,15 @@ struct Buffer {void* data;size_t bytes;unsigned refs=1;bool persistent=false;};
 class Cpu final:public Gpu {
  std::unordered_set<Buffer*> buffers;
  BufferRef take(size_t n,bool persistent,std::string& error){
-  if(!persistent)for(auto*b:buffers)if(!b->persistent&&!b->refs&&b->bytes>=n){b->refs=1;return {this,b};}
-  void* p=std::malloc(std::max(n,size_t(1)));if(!p){error="WASM render memory exhausted; reduce the output size";return {};}
+  // Best-fit reuse: a tiny uniforms upload must not pin a full-frame buffer.
+  // Discard obsolete-size idle buffers before growing the bounded WASM heap.
+  Buffer* best=nullptr;
+  if(!persistent)for(auto*b:buffers)if(!b->persistent&&!b->refs&&b->bytes>=n&&b->bytes<=std::max(n*2,n+65536)&&(!best||b->bytes<best->bytes))best=b;
+  if(best){best->refs=1;return {this,best};}
+  if(n>=1048576)trim_pool(0);
+  void* p=std::malloc(std::max(n,size_t(1)));
+  if(!p){trim_pool(0);p=std::malloc(std::max(n,size_t(1)));}
+  if(!p){error="WASM 内存不足，请选择较小输出尺寸";return {};}
   auto*b=new Buffer{p,n,1,persistent};buffers.insert(b);return {this,b};
  }
  BufferRef put(const void* p,size_t n,bool persist,std::string&e){auto b=take(n,persist,e);if(b&&n)std::memcpy(contents(b.get()),p,n);return b;}

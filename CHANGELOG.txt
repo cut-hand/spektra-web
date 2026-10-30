@@ -1,3 +1,11 @@
+0.5.4 (2026-10-30)
+- Remove rail ellipsis menus; print follows film; remove enlarger illuminant and note.
+- Remove recipe/session/photo management/clipping features; retain core import, selection and clipboard sync.
+- Rounded SVG reset/rotation buttons; reset view fit after geometry edits.
+- Prominent cancellable refinement status; export selects readable and generated file link retained.
+- Best-fit CPU buffer reuse, trim obsolete idle buffers, shared frame ABI input/output, on-demand 2 GiB WASM ceiling.
+- Full WebGPU option deferred until complete pipeline and parity checks; no partial selector shipped.
+
 Spektra browser adaptation: material and LUT changes
 2026-10-30 — cut-hand/spektra-web
 
