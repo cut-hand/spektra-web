@@ -19,5 +19,5 @@ async function establishIsolation(){
  return false;
 }
 let isolated=false;try{isolated=await establishIsolation();}catch(e){console.warn('Spektra RAW isolation:',e.message);}
-await import('./app.js?v=0.6.0');
+await import('./app.js?v=0.6.1');
 if(!isolated){const state=document.getElementById('renderStatus');state.title='当前浏览器未提供 RAW 所需的隔离环境，JPEG/PNG 仍可使用。';}

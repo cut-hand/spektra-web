@@ -19,7 +19,7 @@ dialog{background:#303030;border-color:#555;border-radius:9px;color:#ddd}dialog 
 
 /* 0.3.1: match the supplied right rail and remove added information bars. */
 .native-layout .topbar{grid-template-columns:var(--left-rail) minmax(0,1fr) var(--right-rail)}
-.native-layout .topbar>.right-heading{height:39px;min-height:39px;border-left:1px solid #1b1b1b;padding:5px 16px;margin:0}.native-layout .topbar>.right-heading h2{font-size:12px}.native-layout .topbar>.right-heading #resetBtn{font-size:15px;padding:3px;color:#888}
+.native-layout .topbar>.right-heading{height:39px;min-height:39px;border-left:1px solid #1b1b1b;padding:5px 16px;margin:0}.native-layout .topbar>.right-heading h2{font-size:12px}
 .native-layout .canvas-meta,.native-layout .statusbar{display:none!important}.native-layout .app-layout{height:calc(100dvh - 39px)}.native-layout .right-footer{display:none}.native-layout .parameter-stages{margin-top:0;margin-bottom:9px}
 .native-layout .native-toolbar .file-title{display:flex;gap:6px;align-items:center}.native-toolbar #imageDimensions{font-size:9px;color:#999;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}.native-toolbar #fileName{flex-shrink:0;max-width:130px}.native-layout .about-native{display:none}
 .latitude-view{font-size:10px}.latitude-view canvas{width:100%;height:77px;display:block;background:#1d1e1c}.latitude-ramp{height:6px;margin:5px 0 4px;background:linear-gradient(to right,#080808,#444 35%,#eee 70%,white);border-radius:1px}.latitude-axis{display:flex;justify-content:space-between;color:#959595;font-size:10px;font-weight:650;line-height:13px}.latitude-coverage{display:flex;justify-content:space-between;gap:4px;margin-top:7px;font-size:9px;color:#929292;font-weight:650;white-space:nowrap}.latitude-coverage b{font-weight:700;color:#e0e0e0}.latitude-coverage>span:first-child b,.latitude-coverage>span:last-child b{color:#dfa247}.latitude-limits{font-size:9px;line-height:14px;text-align:center;color:#969696;font-weight:600;margin:5px -5px 0}.latitude-limits span{font-size:8px}.latitude-material{font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:175px;color:#8e8e8e;font-weight:650}.right-panel #latitudePanel .rail-body{padding:1px 15px 11px}.right-panel #latitudePanel .section-menu{display:none}
@@ -41,8 +41,8 @@ dialog{background:#303030;border-color:#555;border-radius:9px;color:#ddd}dialog 
 .photo-shell:not(.picking){cursor:grab;touch-action:none}.photo-shell.is-panning:not(.picking){cursor:grabbing;user-select:none}
 
 /* 0.5.4: readable export controls and consistent circular action icons. */
-.native-layout .section-reset,.native-layout .rotation-button,.native-layout #resetBtn{display:inline-flex;align-items:center;justify-content:center;width:25px;height:25px;padding:3px;border-radius:50%;flex:none;line-height:1}
-.native-layout .section-reset svg,.native-layout .rotation-button svg,.native-layout #resetBtn svg{width:19px;height:19px;display:block;flex:none}
+.native-layout .section-reset,.native-layout .rotation-button{display:inline-flex;align-items:center;justify-content:center;width:25px;height:25px;padding:3px;border-radius:50%;flex:none;line-height:1}
+.native-layout .section-reset svg,.native-layout .rotation-button svg{width:19px;height:19px;display:block;flex:none}
 .native-layout .rotation-button{width:30px;height:30px}.native-layout .rotation-button:hover{background:#494949}
 .native-layout .differences-button{width:28px;height:28px;padding:4px}
 dialog .dialog-field select{height:36px;min-height:36px;padding:7px 30px 7px 12px;font:12px/20px var(--sans);color:#eee;border-radius:18px}
@@ -70,4 +70,9 @@ dialog #jpegQuality::-moz-range-track{height:3px;background:#626262;border-radiu
 .native-layout .native-toolbar svg{width:18px;height:18px;display:block;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .native-layout .native-toolbar .about-native{display:none}
 
-.backend-selector{display:flex;align-items:center;gap:5px;margin-left:auto;margin-right:9px;font-size:10px;color:#aaa;font-weight:500}.backend-selector select{width:80px;height:21px;font-size:10px;padding:1px 19px 1px 8px}.backend-selector select:disabled{opacity:.5}
+.native-layout .view-modes{--mode-width:61px;--mode-height:20px}
+.native-layout .view-modes .backend-selector{display:inline-flex;flex:none;margin:0;padding:0}
+.native-layout .view-modes button,.native-layout .view-modes .backend-selector select{box-sizing:border-box;width:var(--mode-width);min-width:var(--mode-width);height:var(--mode-height);min-height:var(--mode-height);border:1px solid #565656;border-radius:12px;font-size:11px;line-height:18px}
+.native-layout .view-modes .backend-selector select{margin:0;padding:0 9px 0 1px;background-color:transparent;background-position:right 1px center;background-size:8px;color:#bbb;text-align:center;cursor:pointer;color-scheme:dark}
+.native-layout .backend-selector select:disabled{opacity:.5;cursor:wait}
+@media(max-width:720px){.native-layout .view-modes{--mode-width:52px;gap:4px}.native-layout .view-modes button,.native-layout .view-modes .backend-selector select{font-size:9px}}

@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
-import {mountNativeLayout} from './native-layout.js?v=0.6.0';
+import {mountNativeLayout} from './native-layout.js?v=0.6.1';
 import {clipboardSubset} from './clipboard-groups.js';
 import {BackendRouter} from './gpu/router.js';
 import {Renderer} from './renderer.js';
@@ -160,7 +160,7 @@ async function importFiles(files){if(exclusive||importing){toast('请等待当�
 const choose=()=>{if(!exclusive&&!importing)$('fileInput').click();};for(const id of ['importBtn','emptyImport','addPhoto'])$(id).onclick=choose;$('fileInput').onchange=async e=>{const files=Array.from(e.target.files);e.target.value='';await importFiles(files);};
 let dragDepth=0;document.addEventListener('dragenter',e=>{if(!e.dataTransfer.types.includes('Files'))return;e.preventDefault();dragDepth++;$('dropOverlay').hidden=false;});document.addEventListener('dragover',e=>{if(e.dataTransfer.types.includes('Files'))e.preventDefault();});document.addEventListener('dragleave',e=>{if(e.dataTransfer.types.includes('Files')&&--dragDepth<=0){dragDepth=0;$('dropOverlay').hidden=true;}});document.addEventListener('drop',e=>{e.preventDefault();dragDepth=0;$('dropOverlay').hidden=true;void importFiles(e.dataTransfer.files);});
 $('cancelBtn').onclick=()=>{rawDecoder?.dispose();rawDecoder=null;};
-$('paper').onchange=()=>change({paper:$('paper').value});$('crop').onchange=()=>change({crop:$('crop').value});$('border').onchange=()=>change({border:$('border').checked});$('rotateBtn').onclick=()=>change({rotation:(params.rotation+1)%4});document.querySelectorAll('[data-format]').forEach(el=>el.onclick=()=>change({format:el.dataset.format,filmLongMm:el.dataset.format==='120'?84:36,edgeFormat:el.dataset.format==='120'?'120_6x6':'135'}));$('undoBtn').onclick=()=>historyStep(-1);$('redoBtn').onclick=()=>historyStep(1);$('resetBtn').onclick=()=>change({...defaults});
+$('paper').onchange=()=>change({paper:$('paper').value});$('crop').onchange=()=>change({crop:$('crop').value});$('border').onchange=()=>change({border:$('border').checked});$('rotateBtn').onclick=()=>change({rotation:(params.rotation+1)%4});document.querySelectorAll('[data-format]').forEach(el=>el.onclick=()=>change({format:el.dataset.format,filmLongMm:el.dataset.format==='120'?84:36,edgeFormat:el.dataset.format==='120'?'120_6x6':'135'}));$('undoBtn').onclick=()=>historyStep(-1);$('redoBtn').onclick=()=>historyStep(1);
 function setZoom(value){zoom=value;fitPhoto();scheduleRender();}
 $('fitBtn').onclick=()=>setZoom(0);$('oneToOne').onclick=()=>setZoom(1);function zoomBy(f){if(!current)return;zoom=Math.max(.05,Math.min(3,(zoom||viewPlan().zoom)*f));fitPhoto();scheduleRender();}$('zoomIn').onclick=()=>zoomBy(1.25);$('zoomOut').onclick=()=>zoomBy(.8);
 mountViewportInteraction({viewport:$('viewport'),shell:$('photoShell'),canInteract:()=>Boolean(current?.bitmap)&&!exclusive&&!importing&&!pickingWB,getZoom:()=>zoom||viewPlan().zoom,setZoom:value=>{zoom=value;fitPhoto();scheduleRender({interactive:true});},fitToWindow:()=>{setZoom(0);$('viewport').scrollTo(0,0);},afterPan:updateNavigator});
@@ -194,7 +194,7 @@ $('downloadBtn').onclick=async()=>{if(exclusive||importing)return;const targets=
 
 window.addEventListener('unhandledrejection',e=>toast('处理出现问题：'+(e.reason?.message||e.reason)));
 nativeUI=mountNativeLayout(()=>params,change,()=>current?.bitmap);
-const backendLabel=document.createElement('label');backendLabel.className='backend-selector';backendLabel.innerHTML='引擎<select id="renderBackend" aria-label="渲染后端"><option value="wasm">WASM</option><option value="webgpu">WebGPU</option></select>';document.querySelector('.right-heading').insertBefore(backendLabel,$('resetBtn'));backendSelect=$('renderBackend');if(!navigator.gpu){backendSelect.querySelector('[value=webgpu]').disabled=true;backendSelect.title='此浏览器不支持 WebGPU';}
+const backendLabel=document.createElement('label');backendLabel.className='backend-selector';backendLabel.innerHTML='<span class="sr-only">渲染后端</span><select id="renderBackend" name="renderBackend" aria-label="渲染后端"><option value="wasm">WASM</option><option value="webgpu">WebGPU</option></select>';document.querySelector('.view-modes').prepend(backendLabel);backendSelect=$('renderBackend');if(!navigator.gpu){backendSelect.querySelector('[value=webgpu]').disabled=true;backendSelect.title='此浏览器不支持 WebGPU';}
 async function chooseBackend(value){if(exclusive||importing){backendSelect.value=backend.active;toast('请等待当前处理完成');return;}backendSelect.disabled=true;try{if(value==='webgpu')busy('正在启用 WebGPU…');await backend.select(value);}catch(e){backendSelect.value='wasm';}finally{backendSelect.disabled=false;idle();}}
 backendSelect.onchange=()=>void chooseBackend(backendSelect.value);
 syncControls();

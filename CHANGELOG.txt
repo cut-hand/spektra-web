@@ -48,3 +48,6 @@ material profiles and colour settings. They are licensed CC BY-SA 4.0 and
 carry creator credit, source links, licence links and modification notices
 in their headers. Spatial effects, grain, edges and date stamps are excluded.
 The JavaScript implementation is GPL-3.0-or-later; see LICENSE and NOTICE.html.
+
+0.6.1 — 2026-10-31
+Move backend selector immediately before the develop button with matching dimensions. Remove the global header reset button. Rendering engines and group resets unchanged.
